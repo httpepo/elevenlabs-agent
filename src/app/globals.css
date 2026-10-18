@@ -1,0 +1,76 @@
+@import "../design-system/index.css";
+
+@layer base {
+  body { @apply min-h-screen bg-muted text-base leading-relaxed; }
+  a { @apply text-inherit; }
+  button, a, input { -webkit-tap-highlight-color: transparent; }
+  :focus-visible { @apply outline-2 outline-offset-4 outline-ring; }
+  h1 { @apply mb-6 text-4xl leading-tight font-light tracking-tight break-words sm:text-5xl lg:text-6xl; }
+  h1 > span { @apply text-primary; }
+  h2 { @apply mb-5 text-2xl leading-tight font-normal tracking-tight; }
+  h3 { @apply mt-6 mb-2 text-sm font-semibold; }
+  p { @apply mb-4; }
+  code { @apply font-mono text-xs break-words; }
+}
+
+@layer components {
+  .site-header, main, .site-footer { @apply mx-auto w-full max-w-6xl px-5 sm:px-7; }
+  .site-header { @apply flex min-h-20 flex-wrap items-center gap-4 border-b py-5 sm:gap-6; }
+  .brand { @apply shrink-0 rounded-sm; }
+  .brand img { @apply h-auto w-28 sm:w-auto; }
+  .site-header nav { @apply ml-auto flex items-center gap-1; }
+  .case-badge { @apply hidden sm:inline-flex; }
+  .home-grid { @apply grid grid-cols-1 gap-10 py-10 lg:grid-cols-2 lg:gap-20 lg:py-16; }
+  .eyebrow { @apply mb-4 block text-xs font-medium text-primary; }
+  .lede { @apply text-lg leading-relaxed text-muted-foreground; }
+  .journey { @apply mt-9 mb-7 list-none p-0; }
+  .journey li { @apply flex gap-5 border-t py-5; }
+  .journey li > span { @apply text-xs text-primary tabular-nums; }
+  .journey strong { @apply text-sm font-medium; }
+  .journey p { @apply mt-1 mb-0 text-sm text-muted-foreground; }
+  .notice { @apply border-l-2 border-primary pl-3 text-xs text-muted-foreground; }
+  .lead-form, .record-card { @apply rounded-[var(--atlas-radius-card)] p-6 shadow-none sm:p-8; }
+  .lead-form { @apply self-start; }
+  .form-heading { @apply mb-7; }
+  .form-heading .eyebrow { @apply mb-3; }
+  .form-field { @apply mb-5 grid gap-2; }
+  .form-note { @apply mt-4 mb-0 text-xs text-muted-foreground; }
+  .field-error { @apply text-xs text-destructive; }
+  .muted { @apply font-normal text-muted-foreground; }
+  .narrow { @apply mx-auto max-w-2xl; }
+  .page-space { @apply pt-9 pb-12 sm:pt-14 sm:pb-18; }
+  .page-space > .record-card { @apply my-6; }
+  .page-heading { @apply mt-5 mb-7 flex items-start justify-between gap-6 sm:items-center; }
+  .page-heading > div { @apply min-w-0; }
+  .page-status { @apply hidden sm:inline-flex; }
+  .page-heading h1 { @apply mb-3 text-3xl sm:text-4xl lg:text-5xl; }
+  .page-heading .eyebrow { @apply mb-3; }
+  .text-link { @apply text-sm underline underline-offset-4 transition-colors hover:text-primary; }
+  .narrow .record-card p { @apply text-muted-foreground; }
+  .table-wrap { @apply mt-7 overflow-hidden rounded-[var(--atlas-radius-card)] border bg-card; }
+  .lead-table { @apply min-w-3xl; font-family: var(--atlas-font-inter); }
+  .lead-table th, .lead-table td { @apply p-4; }
+  .lead-table th { @apply text-xs; }
+  .lead-table td small { @apply block text-xs text-muted-foreground; }
+  .empty { @apply mt-8 py-12; }
+  .empty p { @apply text-muted-foreground; }
+  .next-steps { @apply mt-12; }
+  .mini-grid { @apply grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4; }
+  .mini-grid .record-card { @apply p-5; }
+  .mini-grid h3 { @apply mt-0 mb-3; }
+  .mini-grid p { @apply m-0 text-xs text-muted-foreground; }
+  .detail-grid { @apply my-6 grid grid-cols-1 gap-6 lg:grid-cols-2; }
+  .record-card { @apply min-w-0; }
+  .record-card dl > div { @apply grid grid-cols-[6rem_minmax(0,1fr)] gap-3 border-b py-3 last:border-0; }
+  .record-card dt { @apply text-xs text-muted-foreground; }
+  .record-card dd { @apply m-0 text-sm wrap-anywhere whitespace-pre-wrap; }
+  .record-card p, .record-card li { @apply text-sm; }
+  .record-card ul { @apply list-disc pl-5; }
+  .spiced-grid { @apply grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5; }
+  .spiced-grid h3 { @apply mt-3; }
+  .spiced-grid p { @apply text-xs text-muted-foreground; }
+  .trace { @apply border-t pt-5; font-family: var(--atlas-font-inter); }
+  .trace > div { @apply mb-3 flex flex-wrap items-center gap-3; }
+  .trace small { @apply text-xs text-muted-foreground; }
+  .site-footer { @apply border-t py-6 text-xs text-muted-foreground; }
+}

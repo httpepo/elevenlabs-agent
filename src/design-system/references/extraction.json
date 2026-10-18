@@ -1,0 +1,2858 @@
+{
+  "brand": "Atlas",
+  "sourceUrl": "local://design-system",
+  "capturedAt": "2026-10-18T15:40:56.111991+00:00",
+  "scope": "Linguagem visual do design system local Atlas em superfícies escura e clara.",
+  "methodology": "CSS público e HTML de cinco tipos de página, confrontados com capturas renderizadas. Variáveis extraídas preservam nomes e valores; papéis DTCG e componentes shadcn são adaptações.",
+  "pages": [
+    {
+      "id": "home",
+      "title": "Página inicial",
+      "path": "/",
+      "scheme": "dark",
+      "screenshot": "atlas-home.png",
+      "url": "/"
+    },
+    {
+      "id": "product",
+      "title": "Tesouraria",
+      "path": "/tesouraria",
+      "scheme": "dark",
+      "screenshot": "atlas-product.png",
+      "url": "/tesouraria"
+    },
+    {
+      "id": "contact",
+      "title": "Contato",
+      "path": "/contato",
+      "scheme": "dark",
+      "screenshot": "atlas-contact.png",
+      "url": "/contato"
+    },
+    {
+      "id": "editorial",
+      "title": "Central de conteúdo",
+      "path": "/blog",
+      "scheme": "light",
+      "screenshot": "atlas-editorial.png",
+      "url": "/blog"
+    },
+    {
+      "id": "simulator",
+      "title": "Simulador",
+      "path": "/simulador-reforma-tributaria",
+      "scheme": "light",
+      "screenshot": "atlas-simulator.png",
+      "url": "/simulador-reforma-tributaria"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "--font-sans",
+      "value": "var(--font-dm-sans)",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-mono",
+      "value": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-zinc-50",
+      "value": "#fafafa",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-zinc-100",
+      "value": "#f4f4f5",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-zinc-200",
+      "value": "#e4e4e7",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-zinc-500",
+      "value": "#71717b",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-zinc-700",
+      "value": "#3f3f46",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-zinc-900",
+      "value": "#18181b",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-50",
+      "value": "#fafafa",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-100",
+      "value": "#f5f5f5",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-200",
+      "value": "#e5e5e5",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-300",
+      "value": "#d4d4d4",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-500",
+      "value": "#737373",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-600",
+      "value": "#525252",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-700",
+      "value": "#404040",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-900",
+      "value": "#171717",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-black",
+      "value": "#000",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-white",
+      "value": "#fff",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--spacing",
+      "value": ".25rem",
+      "group": "Espaçamento",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--breakpoint-md",
+      "value": "64rem",
+      "group": "Layout",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--container-md",
+      "value": "28rem",
+      "group": "Layout",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text-sm",
+      "value": ".875rem",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text-sm--line-height",
+      "value": "calc(1.25 / .875)",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text-base",
+      "value": "1rem",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text-base--line-height",
+      "value": "calc(1.5 / 1)",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text-lg",
+      "value": "1.125rem",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text-lg--line-height",
+      "value": "calc(1.75 / 1.125)",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text-3xl",
+      "value": "1.875rem",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text-3xl--line-height",
+      "value": "calc(2.25 / 1.875)",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text-4xl",
+      "value": "2.25rem",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text-4xl--line-height",
+      "value": "calc(2.5 / 2.25)",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-weight-extralight",
+      "value": "200",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-weight-light",
+      "value": "300",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-weight-normal",
+      "value": "400",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-weight-medium",
+      "value": "500",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-weight-semibold",
+      "value": "600",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-weight-bold",
+      "value": "700",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tracking-tight",
+      "value": "-.025em",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tracking-normal",
+      "value": "0em",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tracking-wide",
+      "value": ".025em",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--leading-tight",
+      "value": "1.25",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--leading-snug",
+      "value": "1.375",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--leading-relaxed",
+      "value": "1.625",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--radius-sm",
+      "value": ".25rem",
+      "group": "Raios",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--radius-md",
+      "value": ".375rem",
+      "group": "Raios",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--radius-lg",
+      "value": ".5rem",
+      "group": "Raios",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--radius-xl",
+      "value": ".75rem",
+      "group": "Raios",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--radius-2xl",
+      "value": "1rem",
+      "group": "Raios",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--ease-out",
+      "value": "cubic-bezier(0, 0, .2, 1)",
+      "group": "Movimento",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--animate-spin",
+      "value": "spin 1s linear infinite",
+      "group": "Movimento",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--animate-pulse",
+      "value": "pulse 2s cubic-bezier(.4, 0, .6, 1) infinite",
+      "group": "Movimento",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--blur-sm",
+      "value": "8px",
+      "group": "Layout",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--blur-md",
+      "value": "12px",
+      "group": "Layout",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--blur-2xl",
+      "value": "40px",
+      "group": "Layout",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--blur-3xl",
+      "value": "64px",
+      "group": "Layout",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--default-transition-duration",
+      "value": ".15s",
+      "group": "Movimento",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--default-transition-timing-function",
+      "value": "cubic-bezier(.4, 0, .2, 1)",
+      "group": "Movimento",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--default-font-family",
+      "value": "var(--font-dm-sans)",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--default-mono-font-family",
+      "value": "var(--font-mono)",
+      "group": "Layout",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-inter",
+      "value": "var(--font-inter)",
+      "group": "Tipografia",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-bg",
+      "value": "#000",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-fg",
+      "value": "#fff",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-fg-muted",
+      "value": "#fff9",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-fg-subtle",
+      "value": "#fff6",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-surface-raised",
+      "value": "#0f0f0f",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-copper-100",
+      "value": "#c97a55",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-copper-300",
+      "value": "#b16d4d",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-copper-500",
+      "value": "#a04a2a",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-copper-700",
+      "value": "#7e4a35",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-copper-900",
+      "value": "#6d311a",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-bevel-light",
+      "value": "#8a6e5d",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-pill-accent",
+      "value": "#ccad23",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-pill-line",
+      "value": "#d6ad1a",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-pill-overlay",
+      "value": "#4f1ad6",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-chrome-bg",
+      "value": "#15151599",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-streak-accent",
+      "value": "#f64838",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-stat-number",
+      "value": "#fff5db",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-about-muted",
+      "value": "#666",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-cdi-accent",
+      "value": "#8bf799",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-integration-line",
+      "value": "#e08a4a",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-workflow-diamond",
+      "value": "#7b3ff2",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-flow-dot",
+      "value": "#d8d8d0",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-flow-text",
+      "value": "#18181b",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-flow-ok-bg",
+      "value": "#f1f9f1",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-flow-ok-text",
+      "value": "#38803a",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-flow-no-text",
+      "value": "#ae1409",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-app-warning-bg",
+      "value": "#fff8e6",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-app-warning-text",
+      "value": "#8c7120",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-brand-linkedin",
+      "value": "#0a66c2",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--radius-button",
+      "value": "10px",
+      "group": "Raios",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--radius-button-outer",
+      "value": "11px",
+      "group": "Raios",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--radius-card",
+      "value": "10px",
+      "group": "Raios",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--radius-pill",
+      "value": "40px",
+      "group": "Raios",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--radius-chrome",
+      "value": "16px",
+      "group": "Raios",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--radius-bento",
+      "value": "20px",
+      "group": "Raios",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--shadow-copper-glow",
+      "value": "0 10px 28px -10px #a5604a73",
+      "group": "Sombras",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--shadow-screen-frame",
+      "value": "0 28px 60px #00000085",
+      "group": "Sombras",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--shadow-chat-panel",
+      "value": "0 32px 80px -24px #000000d9",
+      "group": "Sombras",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--shadow-sim-panel",
+      "value": "0 2px 4px -2px #2424240a, 0 16px 40px -16px #2424241f, 0 48px 80px -48px #7e4a3529",
+      "group": "Sombras",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--shadow-sim-card",
+      "value": "0 1px 3px #24242408, 0 8px 24px -12px #2424241a",
+      "group": "Sombras",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--shadow-sim-thumb",
+      "value": "0 1px 3px #2424241f, 0 0 0 3px #a04a2a0d",
+      "group": "Sombras",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--shadow-sim-thumb-active",
+      "value": "0 2px 6px #2424241f, 0 0 0 5px #a04a2a17",
+      "group": "Sombras",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-sim-ambient",
+      "value": "radial-gradient(ellipse at 20% 40%, #c97a551a, transparent 62%)",
+      "group": "Gradientes",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-sim-preview",
+      "value": "radial-gradient(ellipse at 95% 100%, #c97a551a, transparent 60%), var(--color-paper)",
+      "group": "Gradientes",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-sim-result",
+      "value": "linear-gradient(125deg, var(--color-paper-warm), var(--color-paper) 65%)",
+      "group": "Gradientes",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--shadow-select-menu",
+      "value": "0 24px 80px #00000080",
+      "group": "Sombras",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--shadow-app-toast",
+      "value": "0 8px 24px #0000001f",
+      "group": "Sombras",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-frame-cream",
+      "value": "#f4f3e8",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-comparativo-canvas",
+      "value": "#f3f2e6",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-sim-positive",
+      "value": "#34754a",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-sim-negative",
+      "value": "#b53b30",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-sim-direct",
+      "value": "#cfd3d6",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-reform-navy",
+      "value": "#22334d",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-reform-gray-dark",
+      "value": "#4f4f42",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-reform-gray",
+      "value": "#7a7a6e",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-reform-gray-light",
+      "value": "#dcdcd3",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-reform-gold",
+      "value": "#c6a45c",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-reform-gold-ink",
+      "value": "#8a6a24",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-paper",
+      "value": "#fff",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-paper-2",
+      "value": "#f2f2f2",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-paper-warm",
+      "value": "var(--color-canvas)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-canvas",
+      "value": "#f7f7f8",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-variacao-alta",
+      "value": "#1d7a3c",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-variacao-queda",
+      "value": "#b8321f",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-canvas-line",
+      "value": "#e4e4e7",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-ink",
+      "value": "#242424",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-ink-muted",
+      "value": "#6b6b6b",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-ink-subtle",
+      "value": "#757575",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-rule",
+      "value": "#e6e4e0",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-note-ok",
+      "value": "#6f8050",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-note-warn",
+      "value": "#a97835",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-note-err",
+      "value": "#b85450",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-note-info",
+      "value": "#4f7186",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--reader-cta-width",
+      "value": "16rem",
+      "group": "Layout",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--reader-measure",
+      "value": "680px",
+      "group": "Layout",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--reader-share-offset",
+      "value": "3.5rem",
+      "group": "Layout",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-pill-amber",
+      "value": "radial-gradient(ellipse 65% 600% at 50% 50%, #ccad2324 0%, #ccad2300 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-pill-conic",
+      "value": "conic-gradient(from 0deg, #4f1ad62e 0%, #fff0 50%, #4f1ad62e 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-pill-line",
+      "value": "linear-gradient(90deg, transparent 0%, #d6ad1a33 50%, transparent 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-chrome-streak",
+      "value": "linear-gradient(270deg, #f8d39e00 0%, var(--color-streak-accent) 50%, #f6483800 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--filter-hero-video",
+      "value": "saturate(1.4) hue-rotate(360deg) contrast(1)",
+      "group": "Layout",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-pill-text",
+      "value": "linear-gradient(90deg, #fff 0%, #9990 350%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-trust-divider",
+      "value": "linear-gradient(90deg, #fff0 0%, #fff3 50%, #fff0 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-stat-number",
+      "value": "linear-gradient(180deg, #fff 0%, #fff5db 55%, #d6b27a 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-stat-number-light",
+      "value": "linear-gradient(180deg, #d8a24a 0%, #b0762f 55%, #7e4a22 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-portrait-studio",
+      "value": "radial-gradient(118% 84% at 50% 24%, #fff 0%, #faf7f2 46%, #ebe6dd 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-portrait-studio-dark",
+      "value": "radial-gradient(118% 84% at 50% 24%, #262626 0%, #171717 46%, #0b0b0b 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-portrait-pending",
+      "value": "radial-gradient(ellipse 82% 100% at 50% 106%, #c97a556b 0%, #9e3e1329 44%, #c97a5500 76%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-bento-title",
+      "value": "linear-gradient(180deg, #fff 0%, #fff5db 60%, #d6b27a 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-bento-lines",
+      "value": "repeating-linear-gradient(to right, transparent 0, transparent calc(100% / 7 - 1px), #ffffff24 calc(100% / 7 - 1px), #ffffff24 calc(100% / 7))",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-tesouraria-hero",
+      "value": "radial-gradient(ellipse 80% 60% at 50% 0%, #8bf7991f 0%, #8bf79900 60%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-cdi-glow",
+      "value": "radial-gradient(ellipse 60% 100% at 50% 50%, #8bf7992e 0%, #8bf79900 70%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-product-hero-halo",
+      "value": "radial-gradient(ellipse 92% 62% at 50% 72px, #c97a5566 0%, #c97a5526 30%, #c97a5500 60%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-navbar-fade",
+      "value": "linear-gradient(to bottom, #000000b8 0%, #00000047 58%, #0000 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-atlas-brand",
+      "value": "linear-gradient(90deg, #b7613b 0%, #9e3e13 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-atlas-brand-hover",
+      "value": "linear-gradient(90deg, #8a350f 0%, #8a350f 100%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-product-hero-halo-light",
+      "value": "radial-gradient(ellipse 92% 62% at 50% 72px, #c97a5529 0%, #c97a550f 30%, #c97a5500 60%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-chat-halo",
+      "value": "radial-gradient(ellipse 120% 62% at 50% 0%, #c97a5538 0%, #c97a550f 34%, #c97a5500 62%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-blog-glow",
+      "value": "radial-gradient(circle at 50% -8%, #c97a5529, transparent 34%), radial-gradient(circle at 108% 18%, #7b3ff21a, transparent 30%), radial-gradient(circle at -12% 42%, #c97a5514, transparent 26%)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-blog-grid",
+      "value": "linear-gradient(to right, #ffffff0a 1px, transparent 1px), linear-gradient(to bottom, #ffffff0a 1px, transparent 1px)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--gradient-card-dots",
+      "value": "radial-gradient(#fff1 1px, transparent 1px)",
+      "group": "Gradientes",
+      "selector": ":root",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    }
+  ],
+  "scopedTokens": [
+    {
+      "name": "--font-dm-sans",
+      "value": "\"dmSans\", \"dmSans Fallback\"",
+      "group": "Tipografia",
+      "selector": ".dmsans_70620a68-module__zjX7ta__variable",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-inter",
+      "value": "\"inter\", \"inter Fallback\"",
+      "group": "Tipografia",
+      "selector": ".inter_e2496cbf-module__Y88prW__variable",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-zinc-50",
+      "value": "lab(98.26% 0 0)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-zinc-100",
+      "value": "lab(96.1634% .0993311 -.364041)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-zinc-200",
+      "value": "lab(90.6853% .399232 -1.45452)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-zinc-500",
+      "value": "lab(47.8878% 1.65477 -5.77283)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-zinc-700",
+      "value": "lab(26.8019% 1.35387 -4.68303)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-zinc-900",
+      "value": "lab(8.30603% .618205 -2.16572)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-50",
+      "value": "lab(98.26% 0 0)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-100",
+      "value": "lab(96.52% -.0000298023 .0000119209)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-200",
+      "value": "lab(90.952% 0 -.0000119209)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-300",
+      "value": "lab(84.92% 0 -.0000119209)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-500",
+      "value": "lab(48.496% 0 0)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-600",
+      "value": "lab(34.924% 0 0)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-700",
+      "value": "lab(27.036% 0 0)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--color-neutral-900",
+      "value": "lab(7.78201% -.0000149012 0)",
+      "group": "Cores",
+      "selector": ":root,:host",
+      "contexts": [
+        "@layer theme",
+        "@supports (color:lab(0% 0 0))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-accent",
+      "value": "var(--color-copper-100)",
+      "group": "Layout",
+      "selector": ".\\[--select-accent\\:var\\(--color-copper-100\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-accent",
+      "value": "var(--color-copper-700)",
+      "group": "Layout",
+      "selector": ".\\[--select-accent\\:var\\(--color-copper-700\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-active",
+      "value": "#c97a551f",
+      "group": "Layout",
+      "selector": ".\\[--select-active\\:color-mix\\(in_srgb\\,var\\(--color-copper-100\\)_12\\%\\,transparent\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-active",
+      "value": "color-mix(in srgb,var(--color-copper-100) 12%,transparent)",
+      "group": "Layout",
+      "selector": ".\\[--select-active\\:color-mix\\(in_srgb\\,var\\(--color-copper-100\\)_12\\%\\,transparent\\)\\]",
+      "contexts": [
+        "@layer utilities",
+        "@supports (color:color-mix(in lab, red, red))"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-active",
+      "value": "var(--color-paper-2)",
+      "group": "Layout",
+      "selector": ".\\[--select-active\\:var\\(--color-paper-2\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-border",
+      "value": "#fff6",
+      "group": "Layout",
+      "selector": ".\\[--select-border\\:rgba\\(255\\,255\\,255\\,0\\.4\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-border",
+      "value": "var(--color-rule)",
+      "group": "Layout",
+      "selector": ".\\[--select-border\\:var\\(--color-rule\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-field",
+      "value": "#ffffff05",
+      "group": "Layout",
+      "selector": ".\\[--select-field\\:rgba\\(255\\,255\\,255\\,0\\.02\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-field",
+      "value": "var(--color-paper)",
+      "group": "Layout",
+      "selector": ".\\[--select-field\\:var\\(--color-paper\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-hover-border",
+      "value": "#fff9",
+      "group": "Layout",
+      "selector": ".\\[--select-hover-border\\:rgba\\(255\\,255\\,255\\,0\\.6\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-hover-border",
+      "value": "var(--color-ink-subtle)",
+      "group": "Layout",
+      "selector": ".\\[--select-hover-border\\:var\\(--color-ink-subtle\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-icon",
+      "value": "#fff6",
+      "group": "Layout",
+      "selector": ".\\[--select-icon\\:rgba\\(255\\,255\\,255\\,0\\.4\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-icon",
+      "value": "var(--color-ink-muted)",
+      "group": "Layout",
+      "selector": ".\\[--select-icon\\:var\\(--color-ink-muted\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-menu-border",
+      "value": "#ffffff1a",
+      "group": "Layout",
+      "selector": ".\\[--select-menu-border\\:rgba\\(255\\,255\\,255\\,0\\.1\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-menu-border",
+      "value": "var(--color-rule)",
+      "group": "Layout",
+      "selector": ".\\[--select-menu-border\\:var\\(--color-rule\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-menu",
+      "value": "var(--color-paper)",
+      "group": "Layout",
+      "selector": ".\\[--select-menu\\:var\\(--color-paper\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-menu",
+      "value": "var(--color-surface-raised)",
+      "group": "Layout",
+      "selector": ".\\[--select-menu\\:var\\(--color-surface-raised\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-muted",
+      "value": "#ffffffa6",
+      "group": "Layout",
+      "selector": ".\\[--select-muted\\:rgba\\(255\\,255\\,255\\,0\\.65\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-muted",
+      "value": "var(--color-ink-muted)",
+      "group": "Layout",
+      "selector": ".\\[--select-muted\\:var\\(--color-ink-muted\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-option",
+      "value": "#ffffffb3",
+      "group": "Layout",
+      "selector": ".\\[--select-option\\:rgba\\(255\\,255\\,255\\,0\\.7\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-option",
+      "value": "var(--color-ink-muted)",
+      "group": "Layout",
+      "selector": ".\\[--select-option\\:var\\(--color-ink-muted\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-placeholder",
+      "value": "#ffffff4d",
+      "group": "Layout",
+      "selector": ".\\[--select-placeholder\\:rgba\\(255\\,255\\,255\\,0\\.3\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-placeholder",
+      "value": "var(--color-ink-subtle)",
+      "group": "Layout",
+      "selector": ".\\[--select-placeholder\\:var\\(--color-ink-subtle\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-required",
+      "value": "#ffffff73",
+      "group": "Layout",
+      "selector": ".\\[--select-required\\:rgba\\(255\\,255\\,255\\,0\\.45\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-required",
+      "value": "var(--color-ink-muted)",
+      "group": "Layout",
+      "selector": ".\\[--select-required\\:var\\(--color-ink-muted\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-shadow",
+      "value": "var(--shadow-app-toast)",
+      "group": "Layout",
+      "selector": ".\\[--select-shadow\\:var\\(--shadow-app-toast\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-shadow",
+      "value": "var(--shadow-select-menu)",
+      "group": "Layout",
+      "selector": ".\\[--select-shadow\\:var\\(--shadow-select-menu\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-text",
+      "value": "var(--color-ink)",
+      "group": "Layout",
+      "selector": ".\\[--select-text\\:var\\(--color-ink\\)\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--select-text",
+      "value": "white",
+      "group": "Layout",
+      "selector": ".\\[--select-text\\:white\\]",
+      "contexts": [
+        "@layer utilities"
+      ],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-bg",
+      "value": "#fff",
+      "group": "Layout",
+      "selector": ":root,[data-tone=light]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-fg",
+      "value": "#242424",
+      "group": "Layout",
+      "selector": ":root,[data-tone=light]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-muted",
+      "value": "#6b6b6b",
+      "group": "Layout",
+      "selector": ":root,[data-tone=light]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-subtle",
+      "value": "#757575",
+      "group": "Layout",
+      "selector": ":root,[data-tone=light]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-rule",
+      "value": "#e6e4e0",
+      "group": "Layout",
+      "selector": ":root,[data-tone=light]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-raised",
+      "value": "#f2f2f2",
+      "group": "Layout",
+      "selector": ":root,[data-tone=light]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-logo-invert",
+      "value": "0",
+      "group": "Layout",
+      "selector": ":root,[data-tone=light]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-logo-lift",
+      "value": "1",
+      "group": "Layout",
+      "selector": ":root,[data-tone=light]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-is-light",
+      "value": "1",
+      "group": "Layout",
+      "selector": ":root,[data-tone=light]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-bg",
+      "value": "#000",
+      "group": "Layout",
+      "selector": "[data-tone=dark]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-fg",
+      "value": "#fff",
+      "group": "Layout",
+      "selector": "[data-tone=dark]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-muted",
+      "value": "#fff9",
+      "group": "Layout",
+      "selector": "[data-tone=dark]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-subtle",
+      "value": "#fff6",
+      "group": "Layout",
+      "selector": "[data-tone=dark]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-rule",
+      "value": "#ffffff1f",
+      "group": "Layout",
+      "selector": "[data-tone=dark]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-raised",
+      "value": "#0f0f0f",
+      "group": "Layout",
+      "selector": "[data-tone=dark]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-logo-invert",
+      "value": "1",
+      "group": "Layout",
+      "selector": "[data-tone=dark]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-logo-lift",
+      "value": "1.45",
+      "group": "Layout",
+      "selector": "[data-tone=dark]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--tone-is-light",
+      "value": "0",
+      "group": "Layout",
+      "selector": "[data-tone=dark]",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--bg",
+      "value": "#fff",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text",
+      "value": "#242424",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text-soft",
+      "value": "#6b6b6b",
+      "group": "Tipografia",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--text-mute",
+      "value": "#757575",
+      "group": "Tipografia",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--accent",
+      "value": "#a04a2a",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--accent-soft",
+      "value": "#c8a98d",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--accent-deep",
+      "value": "#7e4a35",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--border",
+      "value": "#f2f2f2",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--border-soft",
+      "value": "#f2f2f2",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--rule",
+      "value": "#e6e4e0",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--panel",
+      "value": "#f2f2f2",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--panel-deep",
+      "value": "#ebebeb",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--panel-quiet",
+      "value": "#fafafa",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--ok",
+      "value": "#1a8917",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--warn",
+      "value": "#a97835",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--err",
+      "value": "#b85450",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--info",
+      "value": "#4f7186",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--code-bg",
+      "value": "#f2f2f2",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--shadow",
+      "value": "0 1px 4px #0000000a",
+      "group": "Layout",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-body",
+      "value": "var(--font-source-serif),\"Source Serif Pro\",georgia,cambria,\"Times New Roman\",times,serif",
+      "group": "Tipografia",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-sans",
+      "value": "var(--font-dm-sans),-apple-system,\"BlinkMacSystemFont\",sans-serif",
+      "group": "Tipografia",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-display",
+      "value": "var(--font-inter),-apple-system,\"BlinkMacSystemFont\",sans-serif",
+      "group": "Tipografia",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-mono",
+      "value": "\"JetBrains Mono\",\"SF Mono\",\"Menlo\",\"Consolas\",monospace",
+      "group": "Tipografia",
+      "selector": ".article-source",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--font-source-serif",
+      "value": "\"sourceSerif\", \"sourceSerif Fallback\"",
+      "group": "Tipografia",
+      "selector": ".sourceserif_f9bd6c8a-module__96AX3a__variable",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--section-heading",
+      "value": "var(--color-ink)",
+      "group": "Layout",
+      "selector": ".simulator-module__K2SuOa__support",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--section-muted",
+      "value": "var(--color-ink-muted)",
+      "group": "Layout",
+      "selector": ".simulator-module__K2SuOa__support",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--section-background",
+      "value": "var(--color-paper)",
+      "group": "Layout",
+      "selector": ".simulator-module__K2SuOa__support",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--section-border",
+      "value": "var(--color-rule)",
+      "group": "Layout",
+      "selector": ".simulator-module__K2SuOa__support",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    },
+    {
+      "name": "--section-card",
+      "value": "var(--color-paper-2)",
+      "group": "Layout",
+      "selector": ".simulator-module__K2SuOa__support",
+      "contexts": [],
+      "source": "local://design-system/tokens.css",
+      "status": "extraído"
+    }
+  ],
+  "stats": {
+    "tokens": 161,
+    "colors": 71,
+    "gradients": 27,
+    "shadows": 9,
+    "pages": 5,
+    "scopedDeclarations": 92
+  },
+  "fonts": [
+    {
+      "name": "DM Sans",
+      "filename": "dm-sans-normal.woff2",
+      "style": "normal",
+      "weight": "100 1000",
+      "source": "references/fonts/dm-sans-normal.woff2"
+    },
+    {
+      "name": "DM Sans",
+      "filename": "dm-sans-italic.woff2",
+      "style": "italic",
+      "weight": "400 700",
+      "source": "references/fonts/dm-sans-italic.woff2"
+    },
+    {
+      "name": "Inter",
+      "filename": "inter-normal.woff2",
+      "style": "normal",
+      "weight": "100 900",
+      "source": "references/fonts/inter-normal.woff2"
+    },
+    {
+      "name": "Source Serif 4",
+      "filename": "source-serif-4-normal.woff2",
+      "style": "normal",
+      "weight": "200 900",
+      "source": "references/fonts/source-serif-4-normal.woff2"
+    },
+    {
+      "name": "Source Serif 4",
+      "filename": "source-serif-4-italic.woff2",
+      "style": "italic",
+      "weight": "200 900",
+      "source": "references/fonts/source-serif-4-italic.woff2"
+    }
+  ],
+  "typeScale": [
+    {
+      "name": "Display / hero",
+      "desktop": "86px",
+      "mobile": "clamp(56px, 8vw, 72px)",
+      "weight": "400",
+      "lineHeight": "90px / 1 no mobile",
+      "tracking": "-3.8px / normal",
+      "source": "local://design-system/typography"
+    },
+    {
+      "name": "Título de seção",
+      "desktop": "54px",
+      "mobile": "35px",
+      "weight": "400",
+      "lineHeight": "50px / 32px",
+      "tracking": "-1.9px / -2px",
+      "source": "local://design-system/typography"
+    },
+    {
+      "name": "Título de funcionalidade",
+      "desktop": "34px",
+      "mobile": "28px abaixo de 1360px",
+      "weight": "500",
+      "lineHeight": "36px / 30px",
+      "tracking": "-1px",
+      "source": "local://design-system/typography"
+    },
+    {
+      "name": "Título de bento",
+      "desktop": "28px",
+      "mobile": "oculto abaixo de 1024px",
+      "weight": "700",
+      "lineHeight": "42px",
+      "tracking": "-1.4px",
+      "source": "local://design-system/typography"
+    },
+    {
+      "name": "Texto base",
+      "desktop": "16px",
+      "mobile": "16px",
+      "weight": "400",
+      "lineHeight": "24px",
+      "tracking": "normal",
+      "source": "CSS: --text-base"
+    },
+    {
+      "name": "Texto auxiliar",
+      "desktop": "14px",
+      "mobile": "14px",
+      "weight": "400",
+      "lineHeight": "20px",
+      "tracking": "normal",
+      "source": "CSS: --text-sm"
+    }
+  ],
+  "patterns": [
+    {
+      "name": "Botão principal",
+      "source": "local://design-system/patterns",
+      "detail": "Cobre, texto branco, raio de token de 10px. O CTA de marketing usa o gradiente --gradient-atlas-brand; hover declarado separado.",
+      "status": "observado"
+    },
+    {
+      "name": "Campos e select",
+      "source": "local://design-system/patterns",
+      "detail": "Rótulo acima do campo, fundo escuro, borda fina, placeholder atenuado, indicação de obrigatoriedade. Select possui tokens de campo, menu e opções.",
+      "status": "observado"
+    },
+    {
+      "name": "Accordion de perguntas",
+      "source": "local://design-system/patterns",
+      "detail": "Perguntas em linhas separadas e respostas por expansão. A API React da reconstrução não é a implementação interna.",
+      "status": "observado"
+    },
+    {
+      "name": "Cards de produto / bento",
+      "source": "local://design-system/patterns",
+      "detail": "Superfície escura, ilustrações de produto e títulos em gradiente. --radius-bento: 20px.",
+      "status": "observado"
+    },
+    {
+      "name": "Navegação",
+      "source": "local://design-system/patterns",
+      "detail": "Marca à esquerda, dropdowns de produtos, indústrias e conteúdos, estado ativo sublinhado e CTA cobre.",
+      "status": "observado"
+    },
+    {
+      "name": "Cookies e preferências",
+      "source": "local://design-system/patterns",
+      "detail": "Painel fixo escuro, ações de rejeitar, aceitar e personalizar; modal de preferências presente no HTML público.",
+      "status": "observado"
+    },
+    {
+      "name": "Stepper e cards de escolha",
+      "source": "local://design-system/patterns",
+      "detail": "Etapas numeradas, cartões para escolha exclusiva e ação desabilitada antes da seleção.",
+      "status": "observado"
+    },
+    {
+      "name": "Sinalização semântica",
+      "source": "local://design-system/patterns",
+      "detail": "CSS nomeia sucesso, erro, aviso e informação. Cores de demonstrações financeiras não comprovam a API do produto autenticado.",
+      "status": "observado"
+    }
+  ],
+  "stylesheets": [
+    "local://design-system/tokens.css"
+  ],
+  "limitations": [
+    "Não inclui Figma, documentação privada, código-fonte do produto autenticado ou inventário oficial de componentes.",
+    "Claro e escuro são superfícies vistas em páginas diferentes; a alternância de tema da biblioteca é uma adaptação.",
+    "A biblioteca shadcn é uma extensão reutilizável tematizada, não uma cópia das implementações internas da Atlas.",
+    "Nomes de papéis DTCG, cores compostas de transparências e combinações sem correspondência direta estão identificados como mapeados ou derivados.",
+    "O perfil estruturado automático foi descartado como base: sugeria cores genéricas incompatíveis com o CSS verificado."
+  ]
+}

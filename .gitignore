@@ -1,0 +1,92 @@
+# Dependências e caches locais do Node/pnpm
+node_modules/
+.pnpm-store/
+.pnpm-cache/
+.pnpm-state/
+.npm/
+.cache/
+
+# Next.js, distribuição e cache incremental do TypeScript
+/.next/
+/out/
+/dist/
+/build/
+*.tsbuildinfo
+/next-env.d.ts
+
+# Ambiente e credenciais: versionar apenas os modelos sem valores reais
+.env
+.env.*
+.envrc
+!.env.example
+!.env.*.example
+.secrets/
+.credentials/
+/.aws/
+/secrets/
+/credentials.json
+/service-account*.json
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Documentos locais e materiais de referência
+/docs/
+
+# Dados dos visitantes e arquivos temporários de execução
+/.data/
+/tmp/
+/temp/
+*.pid
+*.pid.lock
+*.tmp
+
+# Logs e relatórios de diagnóstico do Node
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+/report.*.json
+
+# Cobertura e resultados gerados por testes
+/coverage/
+/.nyc_output/
+/test-results/
+/playwright-report/
+/blob-report/
+
+# Estado local de ferramentas de banco e hospedagem
+/.neon
+/.vercel/
+/.netlify/
+
+# Pacotes gerados para download; tokens e assets do design system são versionados
+/src/design-system/public/downloads/*.zip
+
+# Preferências locais de editores; preservar configurações compartilháveis
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+*.code-workspace
+.claude/settings.local.json
+*~
+*.swp
+*.swo
+*.orig
+*.rej
+
+# Metadados do sistema operacional
+.DS_Store
+.DS_Store?
+._*
+.AppleDouble/
+.LSOverride
+Thumbs.db
+Desktop.ini
+
+# Permanecem versionados: pnpm-lock.yaml, skills-lock.json, skills/,
+# .agents/skills/, .cursor/rules/, AGENTS.md, CLAUDE.md, GEMINI.md e .cursorrules.

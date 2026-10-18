@@ -1,0 +1,15 @@
+---
+description: Regras obrigatórias do projeto, Clean Code e design system local
+globs: "**/*"
+alwaysApply: true
+---
+
+Antes de responder, planejar ou editar qualquer arquivo, leia integralmente o
+`AGENTS.md` na raiz. Ele é o system prompt local e a fonte de verdade deste
+projeto; suas regras devem ser carregadas no início de cada prompt.
+
+Siga rigorosamente:
+1. **Design System**: reutilize os componentes por `@/design-system/components/ui/*`, use `tokens.json` como fonte de verdade, não edite arquivos gerados diretamente e não extraia o design system para pacote externo.
+2. **Arquitetura Modular**: `src/app` para rotas, `src/modules` para casos de uso, `src/infrastructure` para banco/jobs/provedores e `src/components` para composições do produto.
+3. **Clean Code**: nomes significativos, funções pequenas e focadas (SRP), código autoexplicativo (evite comentários redundantes), Regra do Escoteiro (Boy Scout Rule), DRY e tratamento limpo de exceções em funções dedicadas.
+4. **Diretriz de Testes**: Não perca tempo criando testes nem executando testes (`pnpm test`). Concentre-se na implementação direta, `pnpm typecheck` e `pnpm build`.
