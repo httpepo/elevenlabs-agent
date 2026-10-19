@@ -7,9 +7,9 @@ export const runtime = "nodejs";
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
   try {
-    if (!await deploymentAccess.canAccessLead(request, id)) return Response.json({ error: "Acesso não autorizado a este atendimento." }, { status: 403 });
     const payload = await readJson(request);
     const input = parseAvailabilityToolInput(payload);
+    if (!await deploymentAccess.canAccessCalendar(request, id, input.voiceSessionId)) return Response.json({ error: "Acesso não autorizado a este atendimento." }, { status: 403 });
     const result = await calendarRuntime.getAvailability.execute({ leadId: id, ...input });
     return Response.json(result);
   } catch (error) {

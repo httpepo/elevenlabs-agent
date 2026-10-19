@@ -55,6 +55,7 @@ export function parseServerEnvironment(input: Environment): ServerEnvironment {
   if (result.PANEL_USERNAME && /[:\r\n]/.test(result.PANEL_USERNAME)) invalid.push("PANEL_USERNAME");
   if (result.PANEL_PASSWORD && result.PANEL_PASSWORD.length < 24) invalid.push("PANEL_PASSWORD");
   if (result.LEAD_SESSION_SECRET && result.LEAD_SESSION_SECRET.length < 32) invalid.push("LEAD_SESSION_SECRET");
+  if (result.ELEVENLABS_WEBHOOK_SECRET && /https?:\/\/|[\r\n]/i.test(result.ELEVENLABS_WEBHOOK_SECRET)) invalid.push("ELEVENLABS_WEBHOOK_SECRET");
 
   if (invalid.length) throw new EnvironmentError([...new Set(invalid)]);
   return result;

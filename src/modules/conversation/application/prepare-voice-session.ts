@@ -7,6 +7,7 @@ import type { ConversationRepository } from "../ports/conversation-repository.ts
 import type { LeadSessionCredentialVerifier } from "../ports/lead-session-credential-verifier.ts";
 import type { VoiceProvider } from "../ports/voice-provider.ts";
 import type { VoiceToolExecutionRepository } from "../ports/voice-tool-execution-repository.ts";
+import type { VoiceToolCredentialService } from "../ports/voice-tool-credential-service.ts";
 
 export class VoiceAuthorizationError extends Error {
   readonly kind: "unauthorized" | "not_found" | "research_pending" | "research_failed" | "briefing_missing";
@@ -28,6 +29,7 @@ export class PrepareVoiceSessionUseCase {
     private readonly voiceProvider: VoiceProvider,
     private readonly credentials: LeadSessionCredentialVerifier,
     private readonly executions: VoiceToolExecutionRepository,
+    private readonly toolCredentials: VoiceToolCredentialService,
   ) {}
 
   async execute(input: { leadId: string; credential: string | null }) {
@@ -43,6 +45,7 @@ export class PrepareVoiceSessionUseCase {
     const context = compileVoiceContext({ leadId: lead.id, lead: lead.normalized, briefing: eligibility.briefing, voiceSessionId: session.id });
     const startedAt = Date.now();
     try {
+      const calendarCredential = this.toolCredentials.issue({ leadId: lead.id, executionId: lead.executionId, voiceSessionId: session.id });
       const providerSession = await this.voiceProvider.prepareSession({ participantName: lead.normalized.fullName });
       const readySession = await this.conversations.transitionSession({
         sessionId: session.id,
@@ -57,7 +60,7 @@ export class PrepareVoiceSessionUseCase {
         briefingId: eligibility.briefing.id,
         conversationToken: providerSession.conversationToken,
         agentId: providerSession.agentId,
-        dynamicVariables: context,
+        dynamicVariables: { ...context, secret__calendar_authorization: `Bearer ${calendarCredential}` },
       };
     } catch (error) {
       await this.markFailed(session, error);

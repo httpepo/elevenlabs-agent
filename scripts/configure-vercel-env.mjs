@@ -6,8 +6,6 @@ import { loadProjectEnvironment } from "./load-env.mjs";
 loadProjectEnvironment();
 const project = JSON.parse(await readFile(".vercel/project.json", "utf8"));
 if (project.projectName !== "elevenlabs-agent") throw new Error("Confirme o vínculo ao projeto elevenlabs-agent antes de configurar o ambiente.");
-const credentials = parseEnv(await readFile(".secrets/publication.env", "utf8"));
-const environment = { ...process.env, ...credentials, APP_MODE: "live" };
 const names = [
   "APP_MODE", "DATABASE_URL", "DATABASE_URL_UNPOOLED", "NEON_BRANCH",
   "TAVILY_API_KEY", "GEMINI_API_KEY", "GEMINI_MODEL", "ELEVENLABS_API_KEY",
@@ -15,13 +13,33 @@ const names = [
   "AGENDA_BASE_URL", "AGENDA_TOKEN", "AGENDA_AUTH_HEADER", "AGENDA_AUTH_PREFIX",
   "PANEL_USERNAME", "PANEL_PASSWORD",
 ];
-const configured = names.filter((name) => environment[name]?.trim());
+const selected = readSelectedNames();
+const usesPublicationCredentials = selected.some((name) => ["LEAD_SESSION_SECRET", "PANEL_USERNAME", "PANEL_PASSWORD"].includes(name));
+const credentials = usesPublicationCredentials ? parseEnv(await readFile(".secrets/publication.env", "utf8")) : {};
+const environment = { ...process.env, ...credentials, APP_MODE: "live" };
+if (selected.includes("ELEVENLABS_WEBHOOK_SECRET") && /https?:\/\/|[\r\n]/i.test(environment.ELEVENLABS_WEBHOOK_SECRET ?? "")) {
+  throw new Error("ELEVENLABS_WEBHOOK_SECRET deve conter o segredo HMAC da ElevenLabs, nunca uma URL.");
+}
+const configured = selected.filter((name) => environment[name]?.trim());
+if (process.argv.includes("--only") && configured.length !== selected.length) {
+  throw new Error(`Preencha as variáveis selecionadas antes de enviar: ${selected.filter((name) => !configured.includes(name)).join(", ")}.`);
+}
 for (let offset = 0; offset < configured.length; offset += 3) {
   await Promise.all(configured.slice(offset, offset + 3).map(configureVariable));
 }
 console.log(`Ambiente production configurado: ${configured.length} variáveis; nenhum valor foi exibido.`);
-const missing = names.filter((name) => !environment[name]?.trim());
+const missing = selected.filter((name) => !environment[name]?.trim());
 if (missing.length) console.log(`Pendências: ${missing.join(", ")}.`);
+
+function readSelectedNames() {
+  const argumentsList = process.argv.slice(2);
+  if (argumentsList.length === 0) return names;
+  const requested = argumentsList.slice(1);
+  if (argumentsList[0] !== "--only" || requested.length === 0 || requested.some((name) => !names.includes(name))) {
+    throw new Error("Uso: node scripts/configure-vercel-env.mjs [--only NOME_DA_VARIAVEL ...].");
+  }
+  return [...new Set(requested)];
+}
 
 function configureVariable(name) {
   return new Promise((resolve, reject) => {

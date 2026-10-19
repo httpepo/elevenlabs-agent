@@ -36,6 +36,7 @@ import { ListAttendanceOverviewUseCase } from "../modules/audit/application/use-
 import { fileAuditRepository } from "./db/repositories/file-audit-repository.ts";
 import { neonAuditRepository } from "./db/repositories/neon-audit-repository.ts";
 import { DeploymentAccess } from "./security/deployment-access.ts";
+import { HmacVoiceToolCredentialService } from "./security/voice-tool-credential.ts";
 import { ProcessResearchJob } from "../modules/research/application/process-research-job.ts";
 import { VercelResearchQueue, createResearchConsumer } from "./jobs/vercel-research-queue.ts";
 
@@ -43,7 +44,8 @@ export { issueLeadSessionCookie, readLeadSessionCredential } from "./security/le
 
 const useNeonPersistence = Boolean(process.env.DATABASE_URL?.trim());
 const leadStore = useNeonPersistence ? new NeonLeadRepository() : fileLeadStore;
-export const deploymentAccess = new DeploymentAccess(leadStore);
+const voiceToolCredentials = new HmacVoiceToolCredentialService();
+export const deploymentAccess = new DeploymentAccess(leadStore, voiceToolCredentials);
 const researchRepository = useNeonPersistence ? new NeonResearchRepository() : fileResearchRepository;
 const jobQueue = useNeonPersistence ? new NeonJobQueue(researchRepository) : new FileResearchQueue(researchRepository);
 const researchProvider = new TavilySearchAdapter();
@@ -88,6 +90,7 @@ export const conversationRuntime = {
     voiceProvider,
     leadSessionCredentialVerifier,
     conversationRepository,
+    voiceToolCredentials,
   ),
   processBrowserEvent: new ProcessVoiceSessionEventUseCase(leadStore, conversationRepository, leadSessionCredentialVerifier),
   getVoiceSessionStatus: new GetVoiceSessionStatusUseCase(leadStore, conversationRepository, leadSessionCredentialVerifier),

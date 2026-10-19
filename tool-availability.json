@@ -1,0 +1,38 @@
+{
+  "type": "webhook",
+  "name": "consultar_disponibilidade",
+  "description": "Buscar horarios disponiveis na agenda da Atlas no periodo desejado pelo visitante.",
+  "api_schema": {
+    "url": "https://elevenlabs-agent.vercel.app/api/leads/{id}/calendar/availability",
+    "method": "POST",
+    "request_headers": {
+      "Authorization": {
+        "variable_name": "secret__calendar_authorization"
+      }
+    },
+    "path_params_schema": {
+      "id": {
+        "type": "string",
+        "dynamic_variable": "lead_id"
+      }
+    },
+    "request_body_schema": {
+      "type": "object",
+      "properties": {
+        "voiceSessionId": {
+          "type": "string",
+          "dynamic_variable": "voice_session_id"
+        },
+        "de": {
+          "type": "string",
+          "description": "Data inicial ISO 8601"
+        },
+        "ate": {
+          "type": "string",
+          "description": "Data final ISO 8601"
+        }
+      },
+      "required": ["voiceSessionId", "de", "ate"]
+    }
+  }
+}

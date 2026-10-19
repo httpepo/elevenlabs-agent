@@ -1,0 +1,42 @@
+{
+  "type": "webhook",
+  "name": "reservar_reuniao",
+  "description": "Efetivar a reserva de reuniao na agenda da Atlas apos escolha explicita do visitante.",
+  "api_schema": {
+    "url": "https://elevenlabs-agent.vercel.app/api/leads/{id}/calendar/book",
+    "method": "POST",
+    "request_headers": {
+      "Authorization": {
+        "variable_name": "secret__calendar_authorization"
+      }
+    },
+    "path_params_schema": {
+      "id": {
+        "type": "string",
+        "dynamic_variable": "lead_id"
+      }
+    },
+    "request_body_schema": {
+      "type": "object",
+      "properties": {
+        "voiceSessionId": {
+          "type": "string",
+          "dynamic_variable": "voice_session_id"
+        },
+        "slotOfferToken": {
+          "type": "string",
+          "description": "Token retornado na consulta de disponibilidade"
+        },
+        "bookingIntentId": {
+          "type": "string",
+          "description": "Identificador do horario retornado na consulta"
+        },
+        "consent": {
+          "type": "boolean",
+          "description": "Use true somente depois de o visitante escolher explicitamente uma opcao retornada pela consulta e autorizar a reserva. Sem essa confirmacao, nao chame esta ferramenta."
+        }
+      },
+      "required": ["voiceSessionId", "slotOfferToken", "bookingIntentId", "consent"]
+    }
+  }
+}

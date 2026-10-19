@@ -13,7 +13,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       leadId: id,
       credential: readLeadSessionCredential(request),
     });
-    return Response.json(result, { status: 201 });
+    return Response.json(result, { status: 201, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (error instanceof VoiceAuthorizationError) return Response.json({ error: error.message, code: error.kind }, { status: error.status });
     if (isVoiceProviderError(error)) return Response.json({ error: "Não foi possível autorizar o microfone agora. Tente novamente." }, { status: 503 });
