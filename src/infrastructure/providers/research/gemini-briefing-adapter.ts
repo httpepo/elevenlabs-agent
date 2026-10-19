@@ -75,7 +75,17 @@ export class GeminiBriefingAdapter implements BriefingGenerator {
         signal: controller.signal,
         cache: "no-store",
       });
-      if (!response.ok) throw new BriefingGenerationError("O Gemini retornou erro HTTP.", response.status === 408 ? "timeout" : "failed");
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "");
+        let detail = `status ${response.status}`;
+        try {
+          const parsed = JSON.parse(errorText);
+          if (parsed?.error?.message) detail += `: ${parsed.error.message}`;
+        } catch {
+          if (errorText) detail += `: ${errorText.slice(0, 150)}`;
+        }
+        throw new BriefingGenerationError(`O Gemini retornou erro HTTP (${detail}).`, response.status === 408 ? "timeout" : "failed");
+      }
       const payload = await response.json() as GeminiResponse;
       return parseGeneratedBriefing(payload);
     } catch (error) {

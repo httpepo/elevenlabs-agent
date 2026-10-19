@@ -74,7 +74,17 @@ export class GeminiQualificationAdapter implements QualificationExtractor {
         signal: controller.signal,
         cache: "no-store",
       });
-      if (!response.ok) throw new QualificationExtractionError("O Gemini retornou erro na extração SPICED.", response.status === 408 ? "timeout" : "failed");
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "");
+        let detail = `status ${response.status}`;
+        try {
+          const parsed = JSON.parse(errorText);
+          if (parsed?.error?.message) detail += `: ${parsed.error.message}`;
+        } catch {
+          if (errorText) detail += `: ${errorText.slice(0, 150)}`;
+        }
+        throw new QualificationExtractionError(`O Gemini retornou erro na extração SPICED (${detail}).`, response.status === 408 ? "timeout" : "failed");
+      }
       return parseResponse(await response.json());
     } catch (error) {
       if (error instanceof QualificationExtractionError) throw error;
