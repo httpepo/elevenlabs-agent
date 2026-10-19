@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "pnpm build --webpack",
+  "regions": ["gru1"],
+  "functions": {
+    "src/app/api/queues/research/route.ts": {
+      "maxDuration": 120,
+      "experimentalTriggers": [{ "type": "queue/v2beta", "topic": "atlas-research" }]
+    },
+    "src/app/api/webhooks/elevenlabs/route.ts": { "maxDuration": 60 }
+  }
+}
