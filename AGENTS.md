@@ -45,11 +45,12 @@ atendimento e qualificação comercial por voz:
 5. **Agendamento comercial**: consulta de disponibilidade e tentativa de reserva
    somente após escolha e consentimento explícitos do visitante, registrando
    confirmado, conflito, incerto ou falha.
-6. **Painel interno**: visão consolidada por execução com formulário, briefing,
-   transcrição, resumo, SPICED e histórico da agenda.
+6. **Painel interno auditável**: visão consolidada por execução com formulário,
+   briefing, transcrição, resumo, SPICED, objeções, fontes, ferramentas e
+   histórico da agenda.
 
-Mocks identificados servem apenas ao desenvolvimento local; preserve evidências
-auditáveis por execução e documente limites operacionais.
+Mocks identificados servem apenas ao desenvolvimento local; preserve a separação
+entre fatos públicos, declarações do visitante e hipóteses.
 
 ## Arquitetura obrigatória
 
