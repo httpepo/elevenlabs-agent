@@ -1,8 +1,11 @@
 # Audit
 
-Limite reservado para rastreabilidade e deduplicação. A implementação futura
-cria `domain/` para execuções/eventos, `ports/` para armazenamento append-only
-e `application/` para registro e processamento. Jobs e webhooks usam as regras
-de `skills/atlas-reliability/SKILL.md`, a partir da raiz do projeto.
+O módulo mantém o read model sanitizado do painel interno. `ToolExecution` e
+`sanitizePayload` preservam o rastro de chamadas sem gravar tokens, chaves ou
+segredos. `GetLeadAuditSummary` compõe a visão por `leadId` e `executionId`,
+sem misturar tentativas.
 
-Não há inbox/outbox, processamento de webhook ou event bus ativo neste setup.
+`FileAuditRepository` lê os registros locais dos módulos de pesquisa, voz,
+qualificação e agenda; `NeonAuditRepository` consulta `tool_executions` em
+produção. O painel é somente leitura. Webhooks continuam sob responsabilidade
+do módulo de conversa e não há inbox/outbox ou event bus ativo neste setup.
