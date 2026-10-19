@@ -5,8 +5,8 @@ type Environment = Readonly<Record<string, string | undefined>>;
 const optionalNames = [
   "DATABASE_URL", "DATABASE_URL_UNPOOLED", "NEON_BRANCH", "TAVILY_API_KEY",
   "GEMINI_API_KEY", "GEMINI_MODEL", "ELEVENLABS_API_KEY", "ELEVENLABS_AGENT_ID",
-  "ELEVENLABS_WEBHOOK_SECRET", "AGENDA_BASE_URL", "AGENDA_TOKEN",
-  "AGENDA_AUTH_HEADER", "AGENDA_AUTH_PREFIX",
+  "ELEVENLABS_WEBHOOK_SECRET", "LEAD_SESSION_SECRET", "AGENDA_BASE_URL", "AGENDA_TOKEN",
+  "AGENDA_AUTH_HEADER", "AGENDA_AUTH_PREFIX", "PANEL_USERNAME", "PANEL_PASSWORD",
 ] as const;
 
 type OptionalName = typeof optionalNames[number];
@@ -52,6 +52,9 @@ export function parseServerEnvironment(input: Environment): ServerEnvironment {
   if (result.AGENDA_TOKEN && /[\r\n]/.test(result.AGENDA_TOKEN)) invalid.push("AGENDA_TOKEN");
   if (result.AGENDA_AUTH_HEADER && result.AGENDA_AUTH_HEADER.toLowerCase() !== "authorization") invalid.push("AGENDA_AUTH_HEADER");
   if (result.AGENDA_AUTH_PREFIX && result.AGENDA_AUTH_PREFIX !== "Bearer") invalid.push("AGENDA_AUTH_PREFIX");
+  if (result.PANEL_USERNAME && /[:\r\n]/.test(result.PANEL_USERNAME)) invalid.push("PANEL_USERNAME");
+  if (result.PANEL_PASSWORD && result.PANEL_PASSWORD.length < 24) invalid.push("PANEL_PASSWORD");
+  if (result.LEAD_SESSION_SECRET && result.LEAD_SESSION_SECRET.length < 32) invalid.push("LEAD_SESSION_SECRET");
 
   if (invalid.length) throw new EnvironmentError([...new Set(invalid)]);
   return result;
@@ -65,6 +68,6 @@ export function getServerEnvironment(): ServerEnvironment {
 export const integrationRequirements = {
   database: ["DATABASE_URL", "DATABASE_URL_UNPOOLED"],
   research: ["TAVILY_API_KEY", "GEMINI_API_KEY", "GEMINI_MODEL"],
-  voice: ["ELEVENLABS_API_KEY", "ELEVENLABS_AGENT_ID", "ELEVENLABS_WEBHOOK_SECRET"],
+  voice: ["ELEVENLABS_API_KEY", "ELEVENLABS_AGENT_ID", "ELEVENLABS_WEBHOOK_SECRET", "LEAD_SESSION_SECRET"],
   calendar: ["AGENDA_BASE_URL", "AGENDA_TOKEN"],
 } as const satisfies Record<string, readonly OptionalName[]>;

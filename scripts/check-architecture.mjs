@@ -42,7 +42,11 @@ function inspectImport(from, dependency) {
   }
   if (from.startsWith("src/components/") && target && (/^src\/(infrastructure|lib)\//.test(target) || /^src\/modules\/[^/]+\/(domain|ports)\//.test(target))) reason = "componentes recebem DTOs e ações, sem persistência/domínio direto";
   if (/^@neondatabase\//.test(dependency) && !from.startsWith("src/infrastructure/db/")) reason = "driver do banco pertence à infraestrutura de banco";
-  if (/^(@elevenlabs\/|@google\/genai|@tavily\/)/.test(dependency) && !from.startsWith("src/infrastructure/providers/")) reason = "SDK de provedor pertence ao adaptador";
+  if (dependency === "@vercel/queue" && !from.startsWith("src/infrastructure/jobs/")) reason = "SDK de fila pertence ao adaptador de jobs";
+  // O SDK React do ElevenLabs é um adaptador de navegador: precisa viver no
+  // Client Component que possui o microfone. Os demais SDKs continuam server-only.
+  if (/^(@elevenlabs\/|@google\/genai|@tavily\/)/.test(dependency) &&
+      !from.startsWith("src/infrastructure/providers/") && !from.startsWith("src/components/voice/")) reason = "SDK de provedor pertence ao adaptador";
   if (reason) violations.push(`${from} -> ${dependency}: ${reason}`);
 }
 
