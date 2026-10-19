@@ -295,6 +295,19 @@ uma validação relevante falhar.
 Ao relatar o trabalho, informe quais componentes/tokens locais foram usados,
 quais arquivos foram alterados e quais validações foram executadas.
 
+## Versionamento e publicação obrigatórios
+
+- Ao concluir qualquer alteração solicitada no projeto, faça um commit com uma
+  mensagem que descreva a mudança e envie-o ao repositório remoto configurado
+  (`git push`) antes de encerrar a tarefa.
+- Nunca faça deploy de uma alteração que ainda não esteja commitada e enviada
+  ao remoto.
+- Quando houver deploy, confirme primeiro que o commit foi enviado com sucesso,
+  que a árvore de trabalho está limpa e que a publicação corresponde ao commit
+  enviado.
+- Se o commit ou o push falhar, não declare a tarefa concluída nem faça deploy;
+  informe o bloqueio e preserve as alterações locais para correção.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
