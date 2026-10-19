@@ -16,8 +16,8 @@
 @layer components {
   .site-header, main, .site-footer { @apply mx-auto w-full max-w-6xl px-5 sm:px-7; }
   .site-header { @apply flex min-h-20 flex-wrap items-center gap-4 border-b border-border py-5 sm:gap-6; }
-  .brand { @apply shrink-0 rounded-sm; }
-  .brand img { @apply h-auto w-28 sm:w-auto; }
+  .brand { @apply inline-flex w-28 shrink-0 items-center rounded-sm sm:w-36; }
+  .brand img { @apply block h-auto w-full; }
   .site-header nav { @apply ml-auto flex items-center gap-1; }
   .case-badge { @apply hidden sm:inline-flex; }
   .home-grid { @apply grid grid-cols-1 gap-10 py-10 lg:grid-cols-2 lg:gap-20 lg:py-16; }
