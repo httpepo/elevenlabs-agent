@@ -13,6 +13,7 @@ export async function POST(request: Request) {
     if (result.outcome === "rejected") return Response.json({ error: result.message }, { status: 401 });
     if (result.outcome === "unassociated") return Response.json({ message: result.message }, { status: 202 });
     if (result.outcome === "failed") return Response.json({ error: result.message, qualificationStatus: result.qualificationStatus }, { status: 500 });
+    if (result.outcome === "queued") return Response.json({ message: result.message, qualificationStatus: "queued" }, { status: 202 });
     return Response.json({ message: result.message, qualificationStatus: result.qualificationStatus ?? null }, { status: 200 });
   } catch (error) {
     console.error("Falha ao processar webhook de voz", error instanceof Error ? error.name : "UnknownError");

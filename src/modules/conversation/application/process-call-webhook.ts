@@ -6,6 +6,7 @@ import type { ConversationArtifactRepository } from "../ports/conversation-artif
 import type { WebhookEventRepository } from "../ports/webhook-event-repository.ts";
 import type { CallWebhookVerifier } from "../ports/call-webhook-verifier.ts";
 import type { ExtractSpicedQualificationUseCase } from "../../qualification/application/use-cases/extract-spiced-qualification.ts";
+import type { ConversationProcessingJob, ConversationProcessingQueue } from "../ports/conversation-processing-queue.ts";
 
 export class ProcessCallWebhookUseCase {
   constructor(
@@ -14,6 +15,7 @@ export class ProcessCallWebhookUseCase {
     private readonly artifacts: ConversationArtifactRepository,
     private readonly webhooks: WebhookEventRepository,
     private readonly qualification: ExtractSpicedQualificationUseCase,
+    private readonly processingQueue?: ConversationProcessingQueue,
   ) {}
 
   async execute(input: { rawBody: string; signature: string | null }) {
@@ -36,6 +38,11 @@ export class ProcessCallWebhookUseCase {
 
     try {
       await this.appendArtifacts(webhook, session);
+      if (this.processingQueue) {
+        await this.conversations.transitionSession({ sessionId: session.id, status: "finalizing", reason: "Transcrição salva; qualificação enfileirada.", externalCallId: webhook.externalCallId });
+        await this.processingQueue.enqueue(toProcessingJob(webhook));
+        return { outcome: "queued" as const, message: "Artefatos salvos; qualificação enfileirada." };
+      }
       const qualification = await this.qualification.execute({
         leadId: session.leadId,
         executionId: session.executionId,
@@ -66,6 +73,25 @@ export class ProcessCallWebhookUseCase {
       await this.webhooks.updateStatus({ eventId: event.id, status: "failed", errorReason: publicError(error), processedAt: new Date().toISOString() });
       throw error;
     }
+  }
+
+  async executeQueued(job: ConversationProcessingJob): Promise<void> {
+    const session = await this.conversations.findSessionByExternalCallId(job.externalCallId);
+    if (!session) throw new Error("Sessão de voz não encontrada para o processamento enfileirado.");
+    const event = await this.webhooks.getByExternalCallAndType(job.externalCallId, job.eventType);
+    if (!event) throw new Error("Evento de webhook não encontrado para o processamento enfileirado.");
+    const result = await this.qualification.execute({
+      leadId: session.leadId, executionId: session.executionId, voiceSessionId: session.id,
+      externalCallId: job.externalCallId, eventType: job.eventType,
+      idempotencyKey: `${job.externalCallId}:${job.eventType}`, transcript: job.transcript,
+    });
+    if (result.status === "failed") {
+      await this.failSession(session.id, job.externalCallId, result.error ?? "A extração SPICED falhou.");
+      await this.webhooks.updateStatus({ eventId: event.id, status: "failed", errorReason: result.error ?? "A extração SPICED falhou.", processedAt: new Date().toISOString() });
+      throw new Error(result.error ?? "A extração SPICED falhou.");
+    }
+    await this.completeSession(session.id, job.externalCallId);
+    await this.webhooks.updateStatus({ eventId: event.id, status: "processed", errorReason: null, processedAt: new Date().toISOString() });
   }
 
   private async appendArtifacts(webhook: VerifiedCallWebhook, session: { id: string; leadId: string; executionId: string }) {
@@ -116,6 +142,16 @@ export class ProcessCallWebhookUseCase {
       payload: { rejected: true }, errorReason: publicError(error), receivedAt: new Date().toISOString(), processedAt: new Date().toISOString(),
     });
   }
+}
+
+function toProcessingJob(webhook: VerifiedCallWebhook): ConversationProcessingJob {
+  return {
+    externalCallId: webhook.externalCallId,
+    eventType: webhook.eventType,
+    transcript: webhook.transcript ?? "",
+    summary: webhook.summary,
+    occurredAt: webhook.occurredAt,
+  };
 }
 
 function toWebhookEvent(webhook: VerifiedCallWebhook): WebhookEvent {

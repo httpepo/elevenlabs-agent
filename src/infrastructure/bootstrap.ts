@@ -39,6 +39,7 @@ import { DeploymentAccess } from "./security/deployment-access.ts";
 import { HmacVoiceToolCredentialService } from "./security/voice-tool-credential.ts";
 import { ProcessResearchJob } from "../modules/research/application/process-research-job.ts";
 import { VercelResearchQueue, createResearchConsumer } from "./jobs/vercel-research-queue.ts";
+import { VercelConversationProcessingQueue, createConversationConsumer } from "./jobs/vercel-conversation-queue.ts";
 
 export { issueLeadSessionCookie, readLeadSessionCredential } from "./security/lead-session.ts";
 
@@ -80,6 +81,10 @@ const extractSpicedQualification = new ExtractSpicedQualificationUseCase(
 const leadSessionCredentialVerifier = new EnvironmentLeadSessionCredentialVerifier();
 const voiceProvider = new ElevenLabsVoiceProvider();
 const webhookVerifier = new ElevenLabsWebhookVerifier();
+const conversationProcessingQueue = process.env.VERCEL === "1" && useNeonPersistence
+  ? new VercelConversationProcessingQueue()
+  : undefined;
+const processCallWebhook = new ProcessCallWebhookUseCase(webhookVerifier, conversationRepository, conversationRepository, conversationRepository, extractSpicedQualification, conversationProcessingQueue);
 
 export const conversationRuntime = {
   conversationRepository,
@@ -94,7 +99,8 @@ export const conversationRuntime = {
   ),
   processBrowserEvent: new ProcessVoiceSessionEventUseCase(leadStore, conversationRepository, leadSessionCredentialVerifier),
   getVoiceSessionStatus: new GetVoiceSessionStatusUseCase(leadStore, conversationRepository, leadSessionCredentialVerifier),
-  processCallWebhook: new ProcessCallWebhookUseCase(webhookVerifier, conversationRepository, conversationRepository, conversationRepository, extractSpicedQualification),
+  processCallWebhook,
+  consumeProcessingMessage: createConversationConsumer((job) => processCallWebhook.executeQueued(job)),
 };
 
 export const qualificationRuntime = {

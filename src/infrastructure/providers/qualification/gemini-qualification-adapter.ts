@@ -6,10 +6,9 @@ import type { QualificationExtractionInput, QualificationExtractor } from "../..
 import { QualificationExtractionError } from "../../../modules/qualification/ports/qualification-extractor.ts";
 
 const DEFAULT_GEMINI_MODEL = "gemini-3.8-flash";
-// O webhook pós-chamada precisa terminar antes do limite da função serverless.
-// A transcrição e o resumo já foram persistidos antes desta etapa; uma falha
-// rápida deixa a sessão visivelmente marcada como falha sem perder esses dados.
-const QUALIFICATION_TIMEOUT_MS = 10_000;
+// A extração roda no worker, fora do tempo do webhook. O limite protege uma
+// tentativa individual; a fila repete a operação sem perder os artefatos.
+const QUALIFICATION_TIMEOUT_MS = 90_000;
 
 const extractionResponseSchema = {
   type: "OBJECT",
