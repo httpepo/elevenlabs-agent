@@ -2,7 +2,10 @@ export const calendarTimezone = "America/Sao_Paulo";
 export const meetingDurationMilliseconds = 30 * 60 * 1_000;
 export const calendarOpeningMinutes = 9 * 60;
 export const calendarClosingMinutes = 18 * 60;
-export const calendarOfferLifetimeMilliseconds = 10 * 60 * 1_000;
+// A conversa pode levar alguns minutos entre oferecer e confirmar um horário.
+// A validade continua curta, mas evita que uma confirmação legítima expire
+// enquanto o agente esclarece uma objeção do visitante.
+export const calendarOfferLifetimeMilliseconds = 30 * 60 * 1_000;
 
 export type AvailabilityQuery = Readonly<{ from: string; until: string }>;
 export type CalendarSlot = Readonly<{ start: string; end: string }>;

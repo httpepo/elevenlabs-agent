@@ -13,7 +13,7 @@ export class SchedulingAuthorizationError extends Error {
 export class InvalidBookingOfferError extends Error {
   readonly status = 422 as const;
 
-  constructor(message = "Escolha um horário oferecido recentemente antes de confirmar a reunião.") {
+  constructor(message = "Esse horário não está mais disponível para confirmação. Consulte novamente a agenda e ofereça um novo horário antes de tentar reservar.") {
     super(message);
     this.name = "InvalidBookingOfferError";
   }
