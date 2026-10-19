@@ -71,7 +71,7 @@ export function LeadFormComponent({ enabled }: { enabled: boolean }) {
         </div>
       ))}
       {message && <p className="field-error" role="alert">{message}</p>}
-      <Button type="submit" variant="brand" size="lg" className="mt-1 min-h-11 w-full justify-between" disabled={pending || !enabled}>{pending ? "Preparando seu atendimento…" : "Preparar atendimento"}<span aria-hidden="true">↗</span></Button>
+      <Button type="submit" variant="brand" size="lg" className="mt-1 min-h-11 w-full justify-between" disabled={pending || !enabled}>{pending ? "Conectando com a Atlas…" : "Fale com a Atlas"}<span aria-hidden="true">↗</span></Button>
       <p className="form-note">Seu cadastro original fica preservado. A pesquisa será preparada antes da conversa de atendimento.</p>
     </form>
     </Card>

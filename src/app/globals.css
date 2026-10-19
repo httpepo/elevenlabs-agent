@@ -83,10 +83,7 @@
     background: conic-gradient(from 100deg at 50% -25%, transparent 0deg, hsl(var(--footer-glow) / 0.18) 15deg, transparent 24deg, hsl(var(--footer-glow) / 0.15) 40deg, transparent 51deg, hsl(var(--footer-glow) / 0.2) 65deg, transparent 82deg, hsl(var(--footer-glow) / 0.15) 100deg, transparent 120deg, hsl(var(--footer-glow) / 0.18) 143deg, transparent 160deg);
     mask-image: linear-gradient(to bottom, black, transparent);
   }
-  .footer-cta { @apply flex flex-col items-center gap-8 pt-20 pb-16 text-center md:pt-32 md:pb-28; }
-  .footer-cta h2 { @apply m-0 max-w-4xl text-4xl leading-none font-normal tracking-tighter text-balance lg:text-5xl lg:leading-tight; }
-  .footer-cta p { @apply m-0 max-w-lg text-lg leading-relaxed text-muted-foreground; }
-  .footer-navigation { @apply grid grid-cols-2 gap-12 lg:grid-cols-[1.2fr_repeat(4,minmax(0,1fr))]; }
+.footer-navigation { @apply grid grid-cols-2 gap-12 pt-20 md:pt-32 lg:grid-cols-[1.2fr_repeat(4,minmax(0,1fr))]; }
   .footer-brand-column { @apply col-span-2 mb-4 flex min-w-0 flex-col gap-6 lg:col-span-1 lg:mb-0; }
   .footer-brand { @apply inline-flex w-48 max-w-full rounded-sm; }
   .footer-brand img { @apply block h-auto w-full; }
