@@ -3,8 +3,8 @@ import { getServerEnvironment } from "../../config/env.ts";
 import type { BriefingGenerationInput, GeneratedBriefing, ResearchGap } from "../../../modules/research/domain/briefing.ts";
 import { BriefingGenerationError, type BriefingGenerator } from "../../../modules/research/ports/briefing-generator.ts";
 
-const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
-const GEMINI_TIMEOUT_MS = 8_000;
+const DEFAULT_GEMINI_MODEL = "gemini-3.8-flash";
+const GEMINI_TIMEOUT_MS = 25_000;
 
 const briefingSchema = {
   type: "OBJECT",

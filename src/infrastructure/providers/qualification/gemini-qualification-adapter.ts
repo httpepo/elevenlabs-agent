@@ -5,8 +5,8 @@ import { spicedExtractionSchema } from "../../../modules/qualification/domain/sc
 import type { QualificationExtractionInput, QualificationExtractor } from "../../../modules/qualification/ports/qualification-extractor.ts";
 import { QualificationExtractionError } from "../../../modules/qualification/ports/qualification-extractor.ts";
 
-const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
-const QUALIFICATION_TIMEOUT_MS = 8_000;
+const DEFAULT_GEMINI_MODEL = "gemini-3.8-flash";
+const QUALIFICATION_TIMEOUT_MS = 25_000;
 
 const extractionResponseSchema = {
   type: "OBJECT",

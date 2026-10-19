@@ -5,7 +5,7 @@ loadProjectEnvironment();
 const { researchRuntime } = await import("../src/infrastructure/bootstrap.ts");
 
 const workerId = `research-worker:${randomUUID()}`;
-const leaseMs = 30_000;
+const leaseMs = 60_000;
 const once = process.argv.includes("--once");
 
 async function processOne() {
