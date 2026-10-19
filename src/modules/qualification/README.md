@@ -1,9 +1,12 @@
 # Qualification
 
-Limite reservado para a qualificação SPICED. A implementação futura cria
-`domain/` para valores, estados e evidências; `application/` para normalização;
-e `ports/` para persistência. Consulte `docs/SPICED.md` e
-`skills/atlas-domain-modeling/SKILL.md` a partir da raiz do projeto.
+Este módulo implementa a qualificação SPICED pós-call. O domínio mantém as
+cinco dimensões, evidências e estados comerciais. A aplicação normaliza a
+extração Gemini, preserva correções de perfil e registra objeções autorizadas.
 
-Nesta base, os campos desconhecidos da demo continuam no modelo de leads.
-Não há extração por IA nem critérios comerciais implementados aqui.
+`MeetingEligibilityPolicy` não exige SPICED completo: interesse explícito e
+situação ou dor operacional permitem seguir para a agenda. Desinteresse
+explícito encerra a elegibilidade.
+
+O material comercial não fornece preço, certificações ou compatibilidade
+universal de ERP. Perguntas sem claim autorizado viram `pending_specialist`.
