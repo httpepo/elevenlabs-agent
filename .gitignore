@@ -90,3 +90,5 @@ Desktop.ini
 
 # Permanecem versionados: pnpm-lock.yaml, skills-lock.json, skills/,
 # .agents/skills/, .cursor/rules/, AGENTS.md, CLAUDE.md, GEMINI.md e .cursorrules.
+.vercel
+.env*

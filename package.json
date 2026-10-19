@@ -18,17 +18,23 @@
     "typecheck": "tsc --noEmit",
     "design:tokens": "node src/design-system/scripts/build-tokens.mjs",
     "db:check": "node --conditions=react-server scripts/check-db.mjs",
+    "db:status": "node --conditions=react-server scripts/migrate-db.mjs",
+    "db:migrate": "node --conditions=react-server scripts/migrate-db.mjs",
     "pretest": "node scripts/check-runtime.mjs",
     "test": "node --conditions=react-server --test tests/*.test.mjs",
     "check:architecture": "node scripts/check-architecture.mjs",
     "backend:env": "node --conditions=react-server scripts/check-backend-env.mjs",
+    "jobs:worker": "node --experimental-transform-types --conditions=react-server scripts/research-worker.mjs",
     "backend:check": "node scripts/check-runtime.mjs && pnpm check:architecture && pnpm backend:env && pnpm typecheck && pnpm test"
   },
   "dependencies": {
+    "@elevenlabs/react": "^1.0.0",
     "@neondatabase/serverless": "^1.2.0",
     "@next/env": "16.4.2",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.4",
+    "@tanstack/react-query": "^5.90.5",
+    "@vercel/queue": "^0.8.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "next": "16.4.2",
@@ -36,7 +42,8 @@
     "react-dom": "19.3.1",
     "server-only": "^0.0.1",
     "tailwind-merge": "^3.3.1",
-    "tw-animate-css": "^1.4.0"
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.14",
