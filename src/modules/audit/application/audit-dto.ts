@@ -59,6 +59,14 @@ export type AttendanceOverviewItem = Readonly<{
   email: string;
   company: string;
   submittedAt: string;
+  meeting: Readonly<{
+    status: MeetingAttemptStatus;
+    start: string | null;
+    end: string | null;
+    availabilityFrom: string | null;
+    availabilityUntil: string | null;
+    createdAt: string | null;
+  }>;
   stages: Readonly<{
     research: AttendanceStageStatus;
     conversation: AttendanceStageStatus;

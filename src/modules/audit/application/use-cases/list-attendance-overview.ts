@@ -31,6 +31,14 @@ export class ListAttendanceOverviewUseCase {
         email: lead.normalized.email,
         company: lead.normalized.company,
         submittedAt: lead.createdAt,
+        meeting: {
+          status: latestMeeting?.status ?? "not_requested",
+          start: latestMeeting?.start ?? null,
+          end: latestMeeting?.end ?? null,
+          availabilityFrom: latestMeeting?.availabilityFrom ?? null,
+          availabilityUntil: latestMeeting?.availabilityUntil ?? null,
+          createdAt: latestMeeting?.createdAt ?? null,
+        },
         stages: {
           research: researchStatus(run?.status ?? lead.research.status),
           conversation: conversationStatus(session?.status ?? lead.conversation.status),
