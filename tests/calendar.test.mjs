@@ -58,12 +58,23 @@ test("GET usa /disponibilidade e Bearer, preserva o prefixo da base e traduz a r
   assert.deepEqual(await provider.availability(query), { timezone: "America/Sao_Paulo", slots: [slot] });
 });
 
-test("consulta vazia é válida; dados inválidos e erros de autenticação não viram disponibilidade", async () => {
+test("consulta vazia é válida; filtra slots inelegíveis e rejeita contrato ou autenticação inválidos", async () => {
   const empty = new HttpCalendarProvider(configuration, async () => Response.json({ fuso: availability.fuso, livres: [] }));
   assert.deepEqual(await empty.availability(query), { timezone: availability.fuso, slots: [] });
-  for (const payload of [null, {}, { ...availability, livres: "invalid" }, {
-    ...availability, livres: [{ inicio: slot.start, fim: "2026-10-19T10:00:00-03:00" }],
-  }]) {
+  const ineligibleSlots = [
+    { inicio: slot.start, fim: "2026-10-19T10:00:00-03:00" },
+    { inicio: "2026-10-24T09:00:00-03:00", fim: "2026-10-24T09:30:00-03:00" },
+    { inicio: "2026-10-19T18:30:00-03:00", fim: "2026-10-19T19:00:00-03:00" },
+  ];
+  const filtered = new HttpCalendarProvider(configuration, async () => Response.json({
+    fuso: availability.fuso, livres: [...ineligibleSlots, ...availability.livres],
+  }));
+  assert.deepEqual(await filtered.availability(query), { timezone: availability.fuso, slots: [slot] });
+  const noEligibleSlots = new HttpCalendarProvider(configuration, async () => Response.json({
+    fuso: availability.fuso, livres: ineligibleSlots,
+  }));
+  assert.deepEqual(await noEligibleSlots.availability(query), { timezone: availability.fuso, slots: [] });
+  for (const payload of [null, {}, { ...availability, livres: "invalid" }, { ...availability, fuso: "UTC" }]) {
     const provider = new HttpCalendarProvider(configuration, async () => Response.json(payload));
     await assert.rejects(provider.availability(query), (error) => error instanceof CalendarServiceError && error.kind === "invalid_response");
   }
@@ -86,14 +97,14 @@ test("POST usa /reunioes e somente inicio, nome e email; não devolve payload ex
       assert.deepEqual(JSON.parse(options.body), { inicio: booking.start, nome: booking.name, email: booking.email });
       return status === 204 ? new Response(null, { status }) : Response.json({ internal: "must not escape" }, { status });
     });
-    assert.deepEqual(await provider.book(booking), { status: "confirmed", start: booking.start });
+    assert.deepEqual(await provider.book(booking), { status: "confirmed", start: booking.start, statusCode: status });
   }
 });
 
 test("409 retorna conflito, sem confirmar reserva ou repetir o POST", async () => {
   let calls = 0;
   const provider = new HttpCalendarProvider(configuration, async () => { calls++; return new Response(null, { status: 409 }); });
-  assert.deepEqual(await provider.book(booking), { status: "conflict" });
+  assert.deepEqual(await provider.book(booking), { status: "conflict", statusCode: 409 });
   assert.equal(calls, 1);
 });
 
@@ -120,12 +131,12 @@ test("POST tem um sinal de timeout que aborta a espera", async () => {
 
 test("respostas pendentes e erros do servidor nunca confirmam reunião", async () => {
   for (const [status, expected] of [
-    [202, { status: "unknown", reason: "pending" }],
-    [500, { status: "unknown", reason: "server_error" }],
-    [408, { status: "unknown", reason: "server_error" }],
+    [202, { status: "unknown", reason: "pending", statusCode: 202 }],
+    [500, { status: "unknown", reason: "server_error", statusCode: 500 }],
+    [408, { status: "unknown", reason: "server_error", statusCode: 408 }],
     [401, { status: "rejected", statusCode: 401 }],
     [422, { status: "rejected", statusCode: 422 }],
-    [302, { status: "unknown", reason: "unexpected_response" }],
+    [302, { status: "unknown", reason: "unexpected_response", statusCode: 302 }],
   ]) {
     let calls = 0;
     const provider = new HttpCalendarProvider(configuration, async () => { calls++; return new Response(null, { status }); });

@@ -1,9 +1,9 @@
-import type { LeadForm } from "../../leads/domain/lead.ts";
+import type { LeadForm, OriginalLeadForm } from "../../leads/domain/lead.ts";
 import type { TranscriptSegment } from "../domain/transcript.ts";
 import type { SpicedExtractionInput } from "../domain/schemas/spiced-schema.ts";
 
 export type QualificationExtractionInput = {
-  lead: { original: LeadForm; normalized: LeadForm };
+  lead: { original: OriginalLeadForm; normalized: LeadForm };
   transcriptSegments: readonly TranscriptSegment[];
 };
 

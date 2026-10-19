@@ -12,6 +12,10 @@ export type LeadForm = {
   employeeCount: string;
 };
 
+export type OriginalLeadForm = Readonly<
+  Omit<LeadForm, "website" | "employeeCount"> & Partial<Pick<LeadForm, "website" | "employeeCount">>
+>;
+
 export type FieldErrors = Partial<Record<keyof LeadForm, string>>;
 
 export type ResearchStatus = "queued" | "running" | "ready" | "partial" | "failed" | "cancelled";
@@ -22,7 +26,7 @@ export type LeadSubmissionRecord = {
   executionId: string;
   idempotencyKey: string;
   receivedAt: string;
-  original: LeadForm;
+  original: OriginalLeadForm;
   normalized: LeadForm;
 };
 
@@ -51,7 +55,7 @@ export type LeadRecord = {
   submissionId: string;
   createdAt: string;
   mode: "demo";
-  original: LeadForm;
+  original: OriginalLeadForm;
   normalized: LeadForm;
   briefing: { summary: string; gaps: string[] };
   research: { status: ResearchStatus; runId: string | null; sources: { url: string; title: string }[] };
@@ -68,29 +72,30 @@ export type LeadRecord = {
   }[];
 };
 
-export function parseLeadForm(input: unknown): { original: LeadForm; normalized: LeadForm } {
+export function parseLeadForm(input: unknown): { original: OriginalLeadForm; normalized: LeadForm } {
   if (typeof input !== "object" || input === null || Array.isArray(input)) {
     throw new ValidationError({ fullName: "Informe os dados do visitante." });
   }
   const record = input as Record<string, unknown>;
   const fields: FieldErrors = {};
-  const original = {} as LeadForm;
+  const original: Partial<LeadForm> = {};
   const normalized = {} as LeadForm;
   const limits: Record<keyof LeadForm, number> = {
     fullName: 120, email: 254, phone: 40, company: 160, website: 500, employeeCount: 50,
   };
   for (const key of Object.keys(limits) as (keyof LeadForm)[]) {
-    const value = record[key] ?? (key === "website" || key === "employeeCount" ? "" : undefined);
+    const submittedValue = record[key];
+    const optional = key === "website" || key === "employeeCount";
+    const value = submittedValue === undefined && optional ? "" : submittedValue;
     if (typeof value !== "string") {
       fields[key] = "Informe um texto válido.";
-      original[key] = "";
       normalized[key] = "";
       continue;
     }
-    original[key] = value;
+    if (submittedValue !== undefined) original[key] = value;
     normalized[key] = value.trim();
     if (value.length > limits[key]) fields[key] = "O texto ultrapassa o limite deste campo.";
-    if (key !== "website" && key !== "employeeCount" && !normalized[key]) fields[key] = "Preencha este campo.";
+    if (!optional && !normalized[key]) fields[key] = "Preencha este campo.";
   }
   if (normalized.fullName.length < 2) fields.fullName = "Informe seu nome.";
   if (!isValidEmail(normalized.email)) fields.email = "Informe um e-mail válido.";
@@ -114,7 +119,7 @@ export function parseLeadForm(input: unknown): { original: LeadForm; normalized:
   if (Object.keys(fields).length) throw new ValidationError(fields);
   normalized.email = normalized.email.toLowerCase();
   normalized.phone = digits;
-  return { original, normalized };
+  return { original: original as OriginalLeadForm, normalized };
 }
 
 function isValidEmail(email: string): boolean {

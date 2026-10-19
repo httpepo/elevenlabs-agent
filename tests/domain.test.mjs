@@ -13,11 +13,23 @@ test("preserva o formulário original e mantém a normalização separada", () =
   assert.equal(lead.normalized.fullName, "Ana Souza");
   assert.equal(lead.normalized.email, "ana@exemplo.com.br");
   assert.equal(lead.normalized.phone, "11999999999");
+  assert.equal(Object.hasOwn(lead.original, "employeeCount"), false);
+  assert.equal(lead.normalized.employeeCount, "");
+  const { website: _website, ...requiredFields } = form;
+  const omitted = parseLeadForm(requiredFields);
+  assert.deepEqual(omitted.original, requiredFields);
+  assert.equal(omitted.normalized.website, "");
+  assert.equal(omitted.normalized.employeeCount, "");
+  const optionalFields = { ...form, website: "", employeeCount: " 50–100 " };
+  const provided = parseLeadForm(optionalFields);
+  assert.deepEqual(provided.original, optionalFields);
+  assert.equal(provided.normalized.employeeCount, "50–100");
 });
 
 test("a demonstração não inventa pesquisa, qualificação, conversa ou reunião", () => {
   const lead = createDemoLead(form);
-  assert.equal(lead.research.status, "pending");
+  assert.equal(lead.research.status, "queued");
+  assert.equal(lead.research.runId, null);
   assert.deepEqual(lead.research.sources, []);
   for (const field of Object.values(lead.spiced)) {
     assert.equal(field.value, null);

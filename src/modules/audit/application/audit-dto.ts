@@ -1,4 +1,4 @@
-import type { LeadForm } from "../../leads/domain/lead.ts";
+import type { LeadForm, OriginalLeadForm } from "../../leads/domain/lead.ts";
 import type { Briefing, ResearchSource } from "../../research/domain/briefing.ts";
 import type { ResearchRunStatus } from "../../research/domain/research-run.ts";
 import type { TranscriptSegment } from "../../qualification/domain/transcript.ts";
@@ -13,7 +13,7 @@ export type LeadAuditView = Readonly<{
   lead: Readonly<{
     id: string;
     createdAt: string;
-    original: LeadForm;
+    original: OriginalLeadForm;
     normalized: LeadForm;
   }>;
   execution: Readonly<{
@@ -28,7 +28,7 @@ export type LeadAuditView = Readonly<{
     sources: ResearchSource[];
   }>;
   identity: Readonly<{
-    original: LeadForm;
+    original: OriginalLeadForm;
     normalized: LeadForm;
     corrections: LeadProfileCorrection[];
   }>;
