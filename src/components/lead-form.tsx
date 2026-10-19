@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/design-system/components/ui/button";
 import { Card } from "@/design-system/components/ui/card";
@@ -14,6 +14,7 @@ const fields: { name: keyof LeadForm; label: string; type: string; placeholder: 
   { name: "phone", label: "Telefone com DDD", type: "tel", placeholder: "(11) 99999-9999", autoComplete: "tel", max: 40 },
   { name: "company", label: "Empresa", type: "text", placeholder: "Nome da empresa", autoComplete: "organization", max: 160 },
   { name: "website", label: "Site da empresa", type: "url", placeholder: "https://empresa.com.br", autoComplete: "url", max: 500, optional: true },
+  { name: "employeeCount", label: "Número de funcionários", type: "text", placeholder: "Ex.: 11–50", autoComplete: "off", max: 50, optional: true },
 ];
 
 export function LeadFormComponent({ enabled }: { enabled: boolean }) {
@@ -21,6 +22,7 @@ export function LeadFormComponent({ enabled }: { enabled: boolean }) {
   const [pending, setPending] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [message, setMessage] = useState("");
+  const idempotencyKey = useRef<string | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,8 +32,14 @@ export function LeadFormComponent({ enabled }: { enabled: boolean }) {
     setMessage("");
     const values = Object.fromEntries(new FormData(event.currentTarget));
     try {
+      idempotencyKey.current ??= crypto.randomUUID();
       const response = await fetch("/api/leads", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(values),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Idempotency-Key": idempotencyKey.current,
+        },
+        body: JSON.stringify(values),
       });
       const body = await response.json();
       if (!response.ok) {
@@ -57,14 +65,14 @@ export function LeadFormComponent({ enabled }: { enabled: boolean }) {
           <Input id={field.name} name={field.name} type={field.type} placeholder={field.placeholder}
             className="min-h-11 aria-invalid:border-destructive"
             autoComplete={field.autoComplete} required={!field.optional} maxLength={field.max}
-            disabled={pending || !enabled} aria-invalid={Boolean(errors[field.name])}
+            disabled={pending || !enabled} aria-invalid={errors[field.name] ? "true" : undefined}
             aria-describedby={errors[field.name] ? `${field.name}-error` : undefined} />
           {errors[field.name] && <small className="field-error" id={`${field.name}-error`}>{errors[field.name]}</small>}
         </div>
       ))}
       {message && <p className="field-error" role="alert">{message}</p>}
       <Button type="submit" variant="brand" size="lg" className="mt-1 min-h-11 w-full justify-between" disabled={pending || !enabled}>{pending ? "Preparando seu atendimento…" : "Preparar atendimento"}<span aria-hidden="true">↗</span></Button>
-      <p className="form-note">Demonstração local: esta etapa salva o cadastro. Pesquisa externa e conversa por voz serão conectadas nas próximas etapas.</p>
+      <p className="form-note">Seu cadastro original fica preservado. A pesquisa será preparada antes da conversa de atendimento.</p>
     </form>
     </Card>
   );
