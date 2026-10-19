@@ -25,6 +25,16 @@ pnpm design:tokens
 
 Depois, valide com `pnpm typecheck` e `pnpm build`.
 
+## Favicon e identidade visual
+
+`assets/brand/favicon-atlas.svg` define o monograma geométrico adaptativo usado
+nos metadados de `src/app/layout.tsx` como ícone SVG de qualquer tamanho, com
+URL versionada pelo build.
+
+O SVG usa `prefers-color-scheme`: símbolo escuro nas abas claras e branco nas
+escuras, acompanhando o navegador independentemente do tema escuro padrão da
+aplicação. `assets/brand/atlas-white.svg` e `assets/brand/atlas-ink.svg`
+fornecem a marca horizontal para superfícies escuras e claras.
 
 ## Rodapé autoral
 

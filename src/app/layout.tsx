@@ -5,12 +5,16 @@ import { Badge } from "@/design-system/components/ui/badge";
 import { Button } from "@/design-system/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import atlasLogo from "@/design-system/assets/brand/atlas-white.svg";
+import atlasFavicon from "@/design-system/assets/brand/favicon-atlas.svg";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Atlas | Qualificação comercial por voz",
   description: "Base de desenvolvimento do agente de qualificação comercial da Atlas.",
   robots: { index: false, follow: false },
+  icons: {
+    icon: { url: atlasFavicon.src, type: "image/svg+xml", sizes: "any" },
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
