@@ -26,7 +26,7 @@ export default async function AtendimentoPage({ params }: { params: Promise<{ id
       <Card className="record-card">
         <div className="mb-6 flex flex-wrap gap-2"><Badge variant="secondary">{isLocalDemo() ? "Desenvolvimento local" : "Atendimento online"}</Badge><Badge variant="outline">Dados originais preservados</Badge></div>
         <h2>Seu cadastro está rastreável.</h2>
-        <p>O painel interno mantém o formulário, a execução, as fontes e o briefing de cada tentativa.</p>
+        <p>Seu atendimento está pronto para continuar com contexto sobre a sua operação.</p>
         <Button asChild variant="outline" size="lg"><Link href={`/painel/${lead.id}`}>Ver registro no painel <span aria-hidden="true">↗</span></Link></Button>
       </Card>
       <Link className="text-link" href="/">Voltar ao formulário</Link>

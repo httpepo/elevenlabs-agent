@@ -154,7 +154,7 @@ function VoiceSessionContent({ leadId, visitorName }: { leadId: string; visitorN
         <Badge variant={state === "failed" ? "destructive" : state === "active" ? "default" : "outline"}>{statusLabel(state)}</Badge>
       </div>
       <h2>Converse com o atendimento, {visitorName.split(" ")[0]}.</h2>
-      <p className="text-sm text-muted-foreground">O briefing da pesquisa é enviado à sessão autorizada. A conversa só começa após sua ação e permissão do microfone.</p>
+      <p className="text-sm text-muted-foreground">O contexto preparado é enviado à sessão autorizada. A conversa só começa após sua ação e permissão do microfone.</p>
       <div className="voice-visualizer" aria-hidden="true">
         {Array.from({ length: 9 }, (_, index) => <span className={isSpeaking || isListening ? "voice-wave-bar is-live" : "voice-wave-bar"} key={index} />)}
       </div>
@@ -174,7 +174,6 @@ function VoiceSessionContent({ leadId, visitorName }: { leadId: string; visitorN
           {state === "ending" && <span className="form-note">Encerrando a conexão e aguardando a confirmação segura do provedor.</span>}
         </div>
       )}
-      {prepared && <p className="form-note">Execução: <code>{prepared.executionId}</code> · Briefing: <code>{prepared.briefingId}</code></p>}
       <p className="form-note">Modo atual: {mode === "speaking" ? "agente falando" : "aguardando sua fala"}.</p>
     </Card>
   );
@@ -216,7 +215,7 @@ function statusLabel(state: VoiceWidgetState): string {
 }
 
 function statusText(state: VoiceWidgetState, sdkStatus: string, visitorName: string): string {
-  if (state === "idle") return "Seu briefing está pronto.";
+  if (state === "idle") return "Seu atendimento está pronto.";
   if (state === "authorizing") return "Validando sessão e preparando o microfone…";
   if (state === "connecting") return "Conectando o atendimento…";
   if (state === "active") return `${sdkStatus === "connected" ? "Conexão estabelecida." : "Conversa em andamento."} Fale quando estiver pronto.`;

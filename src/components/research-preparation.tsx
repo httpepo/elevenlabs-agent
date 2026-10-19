@@ -51,20 +51,18 @@ function PreparationContent({ leadId, executionId, initialRunId, visitorName }: 
         </Badge>
       </div>
       <div aria-live="polite">
-        <h2>{failed ? "A pesquisa precisa de uma nova tentativa." : ready ? "Briefing pronto para a conversa." : "Estamos preparando seu atendimento."}</h2>
+        <h2>{failed ? "Não conseguimos preparar seu atendimento." : ready ? "Seu atendimento está pronto." : "Estamos preparando seu atendimento."}</h2>
         <p>{messageFor(status?.researchStatus ?? "queued", statusQuery.isLoading, statusQuery.isError)}</p>
-        {status?.briefingSummary && <p className="preparation-summary">{status.briefingSummary}</p>}
       </div>
       <div className="preparation-meta" aria-label="Detalhes da preparação">
         <span>Execução: <code>{executionId}</code></span>
-        {status?.researchRunId && <span>Pesquisa: <code>{status.researchRunId}</code></span>}
         {status?.durationMs !== null && status?.durationMs !== undefined && <span>Tempo: {formatDuration(status.durationMs)}</span>}
       </div>
       {failed ? (
         <div className="preparation-action">
           <p className="field-error" role="alert">{status?.error ?? statusQuery.error?.message ?? "Falha sem diagnóstico disponível."}</p>
           <Button type="button" variant="brand" size="lg" onClick={retryResearch} disabled={retrying}>
-            {retrying ? "Tentando novamente…" : "Tentar pesquisa novamente"}
+            {retrying ? "Tentando novamente…" : "Preparar atendimento novamente"}
           </Button>
         </div>
       ) : ready ? (
@@ -77,16 +75,16 @@ function PreparationContent({ leadId, executionId, initialRunId, visitorName }: 
 }
 
 function statusLabel(status: ResearchStatusView["researchStatus"]): string {
-  const labels: Record<ResearchStatusView["researchStatus"], string> = { queued: "Na fila", running: "Pesquisando", ready: "Pronto", partial: "Parcial", failed: "Falhou", cancelled: "Cancelado" };
+  const labels: Record<ResearchStatusView["researchStatus"], string> = { queued: "Preparando", running: "Preparando", ready: "Pronto", partial: "Pronto com contexto limitado", failed: "Indisponível", cancelled: "Cancelado" };
   return labels[status];
 }
 
 function messageFor(status: ResearchStatusView["researchStatus"], loading: boolean, error: boolean): string {
   if (error) return "Não foi possível consultar o estado da preparação.";
-  if (loading) return "Criando o acompanhamento da pesquisa.";
-  if (status === "queued") return "Cadastro preservado. A pesquisa real aguarda um worker disponível.";
-  if (status === "running") return "Consultamos fontes públicas e montamos um briefing verificável.";
-  if (status === "partial") return "Encontramos contexto limitado. As lacunas ficarão explícitas para a conversa.";
+  if (loading) return "Estamos preparando seu atendimento.";
+  if (status === "queued") return "Seu atendimento será liberado assim que o contexto estiver pronto.";
+  if (status === "running") return "Estamos organizando o contexto para uma conversa mais útil.";
+  if (status === "partial") return "O atendimento seguirá com o contexto disponível e esclarecerá o que faltar na conversa.";
   return "";
 }
 

@@ -43,7 +43,7 @@ function guideFor(kind: VoiceUiErrorKind): { title: string; instructions: string
   };
   if (kind === "credential") return {
     title: "Sessão expirada",
-    instructions: "Atualize a página para renovar sua autorização. O atendimento só começa depois que o briefing correto está disponível.",
+    instructions: "Atualize a página para renovar sua autorização. O atendimento começa assim que a conexão estiver pronta.",
   };
   if (kind === "browser") return {
     title: "Navegador sem suporte",
