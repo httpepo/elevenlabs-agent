@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { LeadRepository } from "../../../leads/ports/lead-repository.ts";
 import { createObjectionRecord } from "../../domain/objections/objection-record.ts";
+import { validateObjectionEvidence } from "../../domain/objections/objection-evidence.ts";
 import { createSpicedDimension, createSpicedQualification, type SpicedDimensionName, type SpicedDimension } from "../../domain/spiced-qualification.ts";
 import { parseTranscript, validateEvidenceRefs, type TranscriptSegment } from "../../domain/transcript.ts";
 import { spicedExtractionSchema, type SpicedExtractionInput } from "../../domain/schemas/spiced-schema.ts";
@@ -74,7 +75,9 @@ export class ExtractSpicedQualificationUseCase {
             id: objection.id,
             category: objection.category,
             originalStatement: objection.originalStatement,
-            response: objection.response,
+            expectedResponse: objection.response,
+            statementEvidenceRef: objection.statementEvidenceRef,
+            actualResponse: objection.actualResponse,
             source: objection.source,
             sourceVersion: objection.sourceVersion,
             status: objection.status,
@@ -178,13 +181,7 @@ export class ExtractSpicedQualificationUseCase {
 
 function normalizeExtraction(extraction: SpicedExtractionInput, segments: readonly TranscriptSegment[], voiceSessionId: string) {
   const invalidEvidence = { count: 0 };
-  const objections = extraction.objections.map((objection) => createObjectionRecord({
-    voiceSessionId,
-    originalStatement: objection.originalStatement,
-    category: objection.category,
-    authorizedClaimIds: objection.authorizedClaimIds,
-    unansweredFollowUp: objection.unansweredFollowUp,
-  }));
+  const objections = normalizeObjections(extraction.objections, segments, voiceSessionId, invalidEvidence);
   const corrections = extraction.profileCorrections.flatMap((correction) => {
     const evidence = validateEvidenceRefs([correction.evidenceRef], segments);
     invalidEvidence.count += evidence.invalidCount;
@@ -200,6 +197,25 @@ function normalizeExtraction(extraction: SpicedExtractionInput, segments: readon
     corrections,
     invalidEvidenceCount: invalidEvidence.count,
   };
+}
+
+function normalizeObjections(
+  objections: SpicedExtractionInput["objections"],
+  segments: readonly TranscriptSegment[],
+  voiceSessionId: string,
+  invalidEvidence: { count: number },
+) {
+  return objections.flatMap((objection) => {
+    const evidence = validateObjectionEvidence(objection, segments);
+    invalidEvidence.count += evidence.invalidCount;
+    if (!evidence.statementEvidenceRef) return [];
+    return [createObjectionRecord({
+      ...objection,
+      voiceSessionId,
+      statementEvidenceRef: evidence.statementEvidenceRef,
+      responseEvidenceRefs: evidence.responseEvidenceRefs,
+    })];
+  });
 }
 
 function normalizeDimension<T extends SpicedDimensionName>(

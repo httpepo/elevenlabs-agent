@@ -1,5 +1,6 @@
 import { MeetingEligibilityPolicy } from "../domain/policies/meeting-eligibility-policy.ts";
 import type { ObjectionRecord } from "../domain/objections/objection-record.ts";
+import { getObjectionDefinition } from "../domain/objections/objection-catalog.ts";
 import type { SpicedDimension, SpicedQualification } from "../domain/spiced-qualification.ts";
 
 export type SpicedQualificationDTO = {
@@ -23,8 +24,12 @@ export type SpicedQualificationDTO = {
   objections: Array<{
     id: string;
     category: ObjectionRecord["category"];
+    categoryLabel: string;
     originalStatement: string;
     response: string;
+    expectedResponse: string;
+    statementEvidenceRef: NonNullable<ObjectionRecord["statementEvidenceRef"]> | null;
+    actualResponse: NonNullable<ObjectionRecord["actualResponse"]> | null;
     source: string;
     sourceVersion: string;
     status: ObjectionRecord["status"];
@@ -59,8 +64,12 @@ export function toSpicedQualificationDTO(qualification: SpicedQualification): Sp
     objections: qualification.objections.map((objection) => ({
       id: objection.id,
       category: objection.category,
+      categoryLabel: objection.category ? getObjectionDefinition(objection.category).label : "Dúvida para especialista",
       originalStatement: objection.originalStatement,
       response: objection.response,
+      expectedResponse: objection.response,
+      statementEvidenceRef: objection.statementEvidenceRef ?? null,
+      actualResponse: objection.actualResponse?.evidenceRefs.length ? objection.actualResponse : null,
       source: objection.source,
       sourceVersion: objection.sourceVersion,
       status: objection.status,

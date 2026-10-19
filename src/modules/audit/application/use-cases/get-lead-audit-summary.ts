@@ -48,8 +48,9 @@ export class GetLeadAuditSummaryUseCase {
       this.audit.listExecutionsByLeadId(lead.id, selectedExecutionId),
     ]);
 
-    const transcriptArtifact = latestArtifact(artifacts, "transcript");
-    const summaryArtifact = latestArtifact(artifacts, "summary");
+    const sessionArtifacts = artifacts.filter((artifact) => artifact.voiceSessionId === session?.id);
+    const transcriptArtifact = latestArtifact(sessionArtifacts, "transcript");
+    const summaryArtifact = latestArtifact(sessionArtifacts, "summary");
     const conversationStatus = session?.status ?? "not_started";
     const meetingAttempts = meetings;
 
@@ -85,7 +86,7 @@ export class GetLeadAuditSummaryUseCase {
         transcript: transcriptArtifact ? parseTranscript(transcriptArtifact.content) : [],
         summary: summaryArtifact?.content ?? null,
       },
-      spiced: qualification ? toSpicedQualificationDTO(qualification) : null,
+      spiced: qualification && qualification.voiceSessionId === session?.id ? toSpicedQualificationDTO(qualification) : null,
       tools: tools.map(toSafeToolExecution),
       meeting: {
         status: meetingAttempts.at(-1)?.status ?? "not_requested",

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { objectionCategories } from "../objections/objection-catalog.ts";
 
 export const dimensionStatusSchema = z.enum([
   "not_asked",
@@ -32,16 +33,9 @@ export const spicedDimensionSchema = z.object({
 
 export const objectionExtractionSchema = z.object({
   originalStatement: z.string().trim().min(1).max(4_000),
-  category: z.enum([
-    "price_cost",
-    "existing_erp",
-    "non_decision_maker",
-    "timing_no_time",
-    "implementation_anxiety",
-    "data_security",
-    "human_interaction",
-    "non_construction_sector",
-  ]).nullable(),
+  statementEvidenceRef: evidenceRefSchema.nullable().default(null),
+  responseEvidenceRefs: z.array(evidenceRefSchema).max(20).default([]),
+  category: z.enum(objectionCategories).nullable(),
   authorizedClaimIds: z.array(z.string().trim().min(1).max(120)).max(20),
   unansweredFollowUp: z.string().trim().max(2_000).nullable(),
 }).strict();

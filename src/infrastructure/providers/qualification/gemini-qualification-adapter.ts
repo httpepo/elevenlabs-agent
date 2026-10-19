@@ -1,6 +1,6 @@
 import "server-only";
 import { getServerEnvironment } from "../../config/env.ts";
-import { objectionCatalog } from "../../../modules/qualification/domain/objections/objection-catalog.ts";
+import { objectionCatalog, objectionCategories } from "../../../modules/qualification/domain/objections/objection-catalog.ts";
 import { spicedExtractionSchema } from "../../../modules/qualification/domain/schemas/spiced-schema.ts";
 import type { QualificationExtractionInput, QualificationExtractor } from "../../../modules/qualification/ports/qualification-extractor.ts";
 import { QualificationExtractionError } from "../../../modules/qualification/ports/qualification-extractor.ts";
@@ -25,11 +25,13 @@ const extractionResponseSchema = {
         type: "OBJECT",
         properties: {
           originalStatement: { type: "STRING" },
-          category: { type: "STRING", nullable: true },
+          statementEvidenceRef: { ...evidenceSchema(), nullable: true },
+          responseEvidenceRefs: { type: "ARRAY", items: evidenceSchema() },
+          category: { type: "STRING", enum: objectionCategories, nullable: true },
           authorizedClaimIds: { type: "ARRAY", items: { type: "STRING" } },
           unansweredFollowUp: { type: "STRING", nullable: true },
         },
-        required: ["originalStatement", "category", "authorizedClaimIds", "unansweredFollowUp"],
+        required: ["originalStatement", "statementEvidenceRef", "responseEvidenceRefs", "category", "authorizedClaimIds", "unansweredFollowUp"],
       },
     },
     profileCorrections: {
@@ -146,16 +148,19 @@ const systemInstruction = [
   "Quando o segmento só tiver o início da fala, mantenha startMs e endMs iguais ao timestamp disponível; não invente duração.",
   "Se algo não foi dito, use unknown ou not_asked. Não invente impacto, urgência, decisão, preço ou aderência.",
   "Para objeção fora do catálogo ou claim sem id autorizado, use category null ou claimIds vazios.",
+  "Cada objeção deve ter statementEvidenceRef de uma fala do visitante (role user), com excerpt exatamente igual a originalStatement. Não transforme falas do agente em objeções.",
+  "Em responseEvidenceRefs, selecione somente trechos literais do agente (role agent) posteriores à objeção que respondam a ela, inclusive respostas incorretas ou incompletas. Não substitua a fala por uma resposta ideal, paráfrase ou texto do catálogo.",
+  "Se não houver resposta identificável para a objeção, retorne responseEvidenceRefs vazio. Não use falas anteriores, do visitante ou sem autor identificado como resposta.",
 ].join(" ");
 
 function buildPrompt(input: QualificationExtractionInput): string {
-  const allowedClaims = objectionCatalog.flatMap((objection) => objection.authorizedClaims.map((claim) => ({ category: objection.category, id: claim.id, text: claim.text })));
+  const allowedClaims = objectionCatalog.map(({ category, label, authorizedClaims }) => ({ category, label, authorizedClaims }));
   return [
     "Dados originais declarados no formulário:",
     JSON.stringify(input.lead.original),
     "Dados normalizados do formulário:",
     JSON.stringify(input.lead.normalized),
-    "Claims autorizados por categoria:",
+    "Categorias e claims autorizados (não são evidência de fala):",
     JSON.stringify(allowedClaims),
     "<external_untrusted_transcript>",
     JSON.stringify(input.transcriptSegments),

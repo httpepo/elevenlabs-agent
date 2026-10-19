@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { TranscriptEvidenceRef } from "../spiced-qualification.ts";
 import {
   getObjectionDefinition,
   specialistFallback,
@@ -12,6 +13,8 @@ export type ObjectionRecord = {
   originalStatement: string;
   category: ObjectionCategory | null;
   response: string;
+  statementEvidenceRef?: TranscriptEvidenceRef | null;
+  actualResponse?: { text: string; evidenceRefs: TranscriptEvidenceRef[] } | null;
   source: string;
   sourceVersion: string;
   status: ObjectionResolutionStatus;
@@ -25,6 +28,8 @@ export function createObjectionRecord(input: {
   voiceSessionId: string;
   originalStatement: string;
   category: ObjectionCategory | null;
+  statementEvidenceRef?: TranscriptEvidenceRef | null;
+  responseEvidenceRefs?: TranscriptEvidenceRef[];
   authorizedClaimIds?: string[];
   unansweredFollowUp?: string | null;
   createdAt?: string;
@@ -52,6 +57,11 @@ export function createObjectionRecord(input: {
     originalStatement,
     category: input.category,
     response,
+    statementEvidenceRef: input.statementEvidenceRef ?? null,
+    actualResponse: input.responseEvidenceRefs?.length ? {
+      text: input.responseEvidenceRefs.map((reference) => reference.excerpt).join("\n"),
+      evidenceRefs: input.responseEvidenceRefs,
+    } : null,
     source: addressedDefinition?.source ?? "specialist_fallback",
     sourceVersion: addressedDefinition?.sourceVersion ?? "2026-10-18",
     status,

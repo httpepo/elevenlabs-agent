@@ -1,6 +1,7 @@
 import { Badge } from "@/design-system/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/design-system/components/ui/card";
 import type { LeadAuditView } from "@/modules/audit/application/audit-dto";
+import { LeadObjections } from "./lead-objections";
 
 export function LeadSpicedCard({ spiced }: { spiced: LeadAuditView["spiced"] }) {
   return (
@@ -26,7 +27,7 @@ export function LeadSpicedCard({ spiced }: { spiced: LeadAuditView["spiced"] }) 
                 </article>
               ))}
             </div>
-            {spiced.objections.length ? <section aria-labelledby="objections-title"><h3 id="objections-title">Objeções registradas</h3><ul className="m-0 grid gap-3 pl-5 text-sm">{spiced.objections.map((objection) => <li key={objection.id}><strong>{objection.originalStatement}</strong><span className="block text-muted-foreground">{objection.response}</span></li>)}</ul></section> : null}
+            <LeadObjections objections={spiced.objections} />
           </>
         ) : (
           <p className="m-0 text-sm text-muted-foreground">A qualificação SPICED ainda não foi extraída para esta execução.</p>
