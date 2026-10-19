@@ -16,7 +16,7 @@ export default function HomePage() {
           <li><span>02</span><div><strong>Uma conversa informada</strong><p>O contexto da sua operação orienta o atendimento.</p></div></li>
           <li><span>03</span><div><strong>Um próximo passo claro</strong><p>Entender a necessidade e avaliar uma reunião.</p></div></li>
         </ol>
-        <p className="notice">{enabled ? "Preparamos o contexto antes da conversa. Falhas de integração aparecem no atendimento." : "Ambiente em preparação. O cadastro será liberado após configurar a persistência e a sessão segura."}</p>
+        {!enabled && <p className="notice">Ambiente em preparação. O cadastro será liberado após configurar a persistência e a sessão segura.</p>}
       </section>
       <LeadFormComponent enabled={enabled} />
     </div>
