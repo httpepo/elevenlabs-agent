@@ -48,7 +48,8 @@ atendimento e qualificação comercial por voz:
 6. **Painel interno**: visão consolidada por execução com formulário, briefing,
    transcrição, resumo, SPICED e histórico da agenda.
 
-Mocks identificados servem apenas ao desenvolvimento local.
+Mocks identificados servem apenas ao desenvolvimento local; preserve evidências
+auditáveis por execução e documente limites operacionais.
 
 ## Arquitetura obrigatória
 
