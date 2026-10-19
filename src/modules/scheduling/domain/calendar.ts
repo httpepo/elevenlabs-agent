@@ -1,19 +1,22 @@
 export const calendarTimezone = "America/Sao_Paulo";
 export const meetingDurationMilliseconds = 30 * 60 * 1_000;
+export const calendarOpeningMinutes = 9 * 60;
+export const calendarClosingMinutes = 18 * 60;
+export const calendarOfferLifetimeMilliseconds = 10 * 60 * 1_000;
 
 export type AvailabilityQuery = Readonly<{ from: string; until: string }>;
 export type CalendarSlot = Readonly<{ start: string; end: string }>;
 export type CalendarAvailability = Readonly<{ timezone: string; slots: CalendarSlot[] }>;
 export type BookingRequest = Readonly<{ start: string; name: string; email: string }>;
 export type BookingResult =
-  | { status: "confirmed"; start: string }
-  | { status: "conflict" }
+  | { status: "confirmed"; start: string; statusCode: 200 | 201 | 204 }
+  | { status: "conflict"; statusCode: 409 }
   | { status: "rejected"; statusCode: number }
-  | { status: "unknown"; reason: "transport" | "server_error" | "pending" | "unexpected_response" };
+  | { status: "unknown"; reason: "transport" | "server_error" | "pending" | "unexpected_response"; statusCode?: number };
 
 export class CalendarValidationError extends Error {
-  constructor() {
-    super("Informe datas válidas e um horário comercial de 30 minutos, além de nome e e-mail para a reserva.");
+  constructor(message = "Informe datas válidas e um horário comercial de 30 minutos, além de nome e e-mail para a reserva.") {
+    super(message);
     this.name = "CalendarValidationError";
   }
 }
@@ -45,7 +48,7 @@ export function validateAvailabilityQuery(query: AvailabilityQuery): void {
   if (parseBoundary(query.from) > parseBoundary(query.until)) throw new CalendarValidationError();
 }
 
-function businessTime(timestamp: number): { day: string; minutes: number; weekday: string; seconds: string } {
+export function getCalendarLocalParts(timestamp: number): { day: string; minutes: number; weekday: string; seconds: string } {
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: calendarTimezone, weekday: "short", year: "numeric", month: "2-digit",
     day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
@@ -62,12 +65,12 @@ function businessTime(timestamp: number): { day: string; minutes: number; weekda
 export function validateCalendarSlot(slot: CalendarSlot): void {
   const start = parseCalendarInstant(slot.start);
   const end = parseCalendarInstant(slot.end);
-  const localStart = businessTime(start);
-  const localEnd = businessTime(end);
+  const localStart = getCalendarLocalParts(start);
+  const localEnd = getCalendarLocalParts(end);
   if (end - start !== meetingDurationMilliseconds ||
       !["Mon", "Tue", "Wed", "Thu", "Fri"].includes(localStart.weekday) ||
-      localStart.day !== localEnd.day || localStart.minutes < 9 * 60 || localEnd.minutes > 18 * 60 ||
-      localStart.seconds !== "00" || start % 1_000 !== 0) throw new CalendarValidationError();
+      localStart.day !== localEnd.day || localStart.minutes < calendarOpeningMinutes || localEnd.minutes > calendarClosingMinutes ||
+      localStart.minutes % 30 !== 0 || localStart.seconds !== "00" || start % 1_000 !== 0) throw new CalendarValidationError();
 }
 
 export function validateBookingRequest(request: BookingRequest): void {

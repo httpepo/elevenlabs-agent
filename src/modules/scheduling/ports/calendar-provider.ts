@@ -10,7 +10,11 @@ export class CalendarServiceError extends Error {
   readonly kind: "authentication" | "unavailable" | "invalid_response";
 
   constructor(kind: CalendarServiceError["kind"]) {
-    super("Não foi possível consultar a agenda. Nenhuma reserva foi confirmada.");
+    super(kind === "authentication"
+      ? "A agenda recusou a autenticação do servidor. Nenhuma reserva foi confirmada."
+      : kind === "invalid_response"
+        ? "A agenda retornou uma resposta inválida. Nenhuma reserva foi confirmada."
+        : "A agenda não respondeu dentro do limite. Nenhuma reserva foi confirmada.");
     this.name = "CalendarServiceError";
     this.kind = kind;
   }

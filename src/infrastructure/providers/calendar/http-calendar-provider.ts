@@ -67,11 +67,15 @@ export class HttpCalendarProvider implements CalendarProvider {
     try {
       const payload: unknown = await response.json();
       if (!isRecord(payload) || payload.fuso !== calendarTimezone || !Array.isArray(payload.livres)) throw new Error();
-      const slots = payload.livres.map((item: unknown) => {
-        if (!isRecord(item) || typeof item.inicio !== "string" || typeof item.fim !== "string") throw new Error();
+      const slots = payload.livres.flatMap((item: unknown) => {
+        if (!isRecord(item) || typeof item.inicio !== "string" || typeof item.fim !== "string") return [];
         const slot = { start: item.inicio, end: item.fim };
-        validateCalendarSlot(slot);
-        return slot;
+        try {
+          validateCalendarSlot(slot);
+          return [slot];
+        } catch {
+          return [];
+        }
       });
       return { timezone: payload.fuso, slots };
     } catch {
@@ -88,12 +92,30 @@ export class HttpCalendarProvider implements CalendarProvider {
     } catch {
       return { status: "unknown", reason: "transport" };
     }
-    if (response.status === 409) return { status: "conflict" };
-    if ([200, 201, 204].includes(response.status)) return { status: "confirmed", start: input.start };
-    if (response.status === 202) return { status: "unknown", reason: "pending" };
-    if (response.status >= 500 || response.status === 408) return { status: "unknown", reason: "server_error" };
+    if (response.status === 409) return { status: "conflict", statusCode: 409 };
+    if (response.status === 200 || response.status === 201 || response.status === 204) {
+      return { status: "confirmed", start: input.start, statusCode: response.status };
+    }
+    if (response.status === 202) return { status: "unknown", reason: "pending", statusCode: response.status };
+    if (response.status >= 500 || response.status === 408) return { status: "unknown", reason: "server_error", statusCode: response.status };
     if (response.status >= 400 && response.status < 500) return { status: "rejected", statusCode: response.status };
-    return { status: "unknown", reason: "unexpected_response" };
+    return { status: "unknown", reason: "unexpected_response", statusCode: response.status };
+  }
+}
+
+export class LazyCalendarProvider implements CalendarProvider {
+  private provider: CalendarProvider | null = null;
+
+  async availability(query: AvailabilityQuery): Promise<CalendarAvailability> {
+    return this.getProvider().availability(query);
+  }
+
+  async book(input: BookingRequest): Promise<BookingResult> {
+    return this.getProvider().book(input);
+  }
+
+  private getProvider(): CalendarProvider {
+    return this.provider ??= createConfiguredCalendarProvider();
   }
 }
 
