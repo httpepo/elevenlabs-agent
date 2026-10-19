@@ -58,7 +58,7 @@ export function LeadFormComponent({ enabled }: { enabled: boolean }) {
   return (
     <Card className="lead-form">
     <form id="cadastro" onSubmit={submit} aria-label="Seus dados para atendimento" aria-busy={pending}>
-      <div className="form-heading"><span className="eyebrow">Primeiro contato</span><h2>Conte um pouco sobre você.</h2></div>
+      <div className="form-heading"><h2>Conte um pouco sobre você.</h2></div>
       {fields.map((field) => (
         <div className="form-field" key={field.name}>
           <Label htmlFor={field.name}>{field.label}{field.optional && <span className="muted"> · opcional</span>}</Label>
