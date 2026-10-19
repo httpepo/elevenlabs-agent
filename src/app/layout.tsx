@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/design-system/components/ui/badge";
 import { Button } from "@/design-system/components/ui/button";
-import atlasLogo from "@/design-system/assets/brand/atlas-ink.svg";
+import atlasLogo from "@/design-system/assets/brand/atlas-white.svg";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className="dark">
       <body>
         <header className="site-header">
           <Link href="/" className="brand" aria-label="Atlas · início"><Image src={atlasLogo} alt="Atlas" width={139} height={17} priority /></Link>

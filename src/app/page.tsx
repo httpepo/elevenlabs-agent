@@ -1,10 +1,10 @@
 import { LeadFormComponent } from "@/components/lead-form";
-import { isLocalDemo } from "@/infrastructure/config/demo";
+import { deploymentAccess } from "@/infrastructure/bootstrap";
 
 export const dynamic = "force-dynamic";
 
 export default function HomePage() {
-  const enabled = isLocalDemo();
+  const enabled = deploymentAccess.isEnabled();
   return (
     <div className="home-grid">
       <section className="intro">
@@ -16,7 +16,7 @@ export default function HomePage() {
           <li><span>02</span><div><strong>Uma conversa informada</strong><p>Pesquisa e briefing vão orientar o atendimento.</p></div></li>
           <li><span>03</span><div><strong>Um próximo passo claro</strong><p>Entender a necessidade e avaliar uma reunião.</p></div></li>
         </ol>
-        <p className="notice">{enabled ? "Demonstração local · sem chamadas a serviços externos." : "Ambiente em preparação. O cadastro está disponível apenas durante o desenvolvimento local."}</p>
+        <p className="notice">{enabled ? "O briefing é preparado antes da conversa. Falhas de integração aparecem no atendimento." : "Ambiente em preparação. O cadastro será liberado após configurar a persistência e a sessão segura."}</p>
       </section>
       <LeadFormComponent enabled={enabled} />
     </div>

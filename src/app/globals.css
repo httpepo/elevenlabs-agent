@@ -1,7 +1,7 @@
 @import "../design-system/index.css";
 
 @layer base {
-  body { @apply min-h-screen bg-muted text-base leading-relaxed; }
+  body { @apply min-h-screen bg-background text-foreground text-base leading-relaxed; }
   a { @apply text-inherit; }
   button, a, input { -webkit-tap-highlight-color: transparent; }
   :focus-visible { @apply outline-2 outline-offset-4 outline-ring; }
@@ -15,7 +15,7 @@
 
 @layer components {
   .site-header, main, .site-footer { @apply mx-auto w-full max-w-6xl px-5 sm:px-7; }
-  .site-header { @apply flex min-h-20 flex-wrap items-center gap-4 border-b py-5 sm:gap-6; }
+  .site-header { @apply flex min-h-20 flex-wrap items-center gap-4 border-b border-border py-5 sm:gap-6; }
   .brand { @apply shrink-0 rounded-sm; }
   .brand img { @apply h-auto w-28 sm:w-auto; }
   .site-header nav { @apply ml-auto flex items-center gap-1; }
@@ -72,5 +72,21 @@
   .trace { @apply border-t pt-5; font-family: var(--atlas-font-inter); }
   .trace > div { @apply mb-3 flex flex-wrap items-center gap-3; }
   .trace small { @apply text-xs text-muted-foreground; }
-  .site-footer { @apply border-t py-6 text-xs text-muted-foreground; }
+  .site-footer { @apply border-t border-border py-6 text-xs text-muted-foreground; }
+  .preparation-card { @apply border-primary/40; }
+  .preparation-summary { @apply border-l-2 border-primary pl-3 text-sm text-foreground; }
+  .preparation-meta { @apply my-6 grid gap-2 border-y py-4 text-xs text-muted-foreground sm:grid-cols-3; }
+  .preparation-meta code { @apply text-foreground; }
+  .preparation-action { @apply grid gap-3; }
+  .voice-session-card { @apply border-primary/40; }
+  .voice-visualizer { @apply my-7 flex h-16 items-center justify-center gap-1.5 rounded-md border bg-background px-6; }
+  .voice-wave-bar { @apply block h-3 w-1 rounded-full bg-muted-foreground/40 transition-all; }
+  .voice-wave-bar:nth-child(2), .voice-wave-bar:nth-child(8) { @apply h-6; }
+  .voice-wave-bar:nth-child(3), .voice-wave-bar:nth-child(7) { @apply h-9; }
+  .voice-wave-bar:nth-child(4), .voice-wave-bar:nth-child(6) { @apply h-12; }
+  .voice-wave-bar:nth-child(5) { @apply h-16; }
+  .voice-wave-bar.is-live { @apply animate-pulse bg-primary; }
+  .voice-status { @apply grid gap-2 text-sm; }
+  .voice-last-message { @apply text-xs text-muted-foreground; }
+  .voice-actions { @apply mt-6 flex flex-wrap gap-3; }
 }
