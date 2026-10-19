@@ -102,7 +102,7 @@ export const objectionCatalog: readonly ObjectionDefinition[] = [
     label: "Preferência por atendimento humano",
     triggers: ["você é um robô", "quero falar com uma pessoa", "pessoa de verdade", "atendimento humano"],
     authorizedClaims: [],
-    response: "Sou a assistente virtual da Atlas. Posso oferecer uma reunião com um especialista humano e verificar horários, se você quiser.",
+    response: "Eu sou o Anderson, da Atlas. Posso oferecer uma reunião com um especialista humano e verificar horários, se você quiser.",
     source: "policy/attendance-conduct",
     sourceVersion: "2026-10-16",
   },

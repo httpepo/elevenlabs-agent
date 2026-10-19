@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Badge } from "@/design-system/components/ui/badge";
 import { Button } from "@/design-system/components/ui/button";
 import { Card } from "@/design-system/components/ui/card";
@@ -10,11 +9,10 @@ export type VoiceUiErrorKind = "permission" | "missing" | "network" | "credentia
 type MicPermissionGuideProps = {
   kind: VoiceUiErrorKind;
   message: string;
-  leadId: string;
   onRetry: () => void;
 };
 
-export function MicPermissionGuide({ kind, message, leadId, onRetry }: MicPermissionGuideProps) {
+export function MicPermissionGuide({ kind, message, onRetry }: MicPermissionGuideProps) {
   const guide = guideFor(kind);
   return (
     <Card className="border-destructive/50 bg-destructive/5 p-5" role="alert">
@@ -26,7 +24,6 @@ export function MicPermissionGuide({ kind, message, leadId, onRetry }: MicPermis
       <p className="text-sm text-muted-foreground">{guide.instructions}</p>
       <div className="mt-5 flex flex-wrap gap-3">
         <Button type="button" variant="brand" onClick={onRetry}>Tentar novamente</Button>
-        <Button asChild type="button" variant="outline"><Link href={`/painel/${leadId}`}>Ver status no painel</Link></Button>
       </div>
     </Card>
   );
@@ -42,8 +39,8 @@ function guideFor(kind: VoiceUiErrorKind): { title: string; instructions: string
     instructions: "Conecte ou selecione um dispositivo de entrada de áudio e tente iniciar a conversa novamente.",
   };
   if (kind === "credential") return {
-    title: "Sessão expirada",
-    instructions: "Atualize a página para renovar sua autorização. O atendimento começa assim que a conexão estiver pronta.",
+    title: "Atualize a página",
+    instructions: "Atualize esta página e tente iniciar o atendimento novamente.",
   };
   if (kind === "browser") return {
     title: "Navegador sem suporte",
@@ -51,10 +48,10 @@ function guideFor(kind: VoiceUiErrorKind): { title: string; instructions: string
   };
   if (kind === "network") return {
     title: "Conexão interrompida",
-    instructions: "Confira sua conexão e tente novamente. A sessão não será marcada como concluída sem confirmação do provedor.",
+    instructions: "Confira sua conexão e tente novamente.",
   };
   return {
     title: "Não foi possível iniciar",
-    instructions: "Tente novamente. Se o problema continuar, consulte o status do atendimento no painel.",
+    instructions: "Aguarde alguns instantes e tente novamente.",
   };
 }

@@ -6,16 +6,15 @@ import { Badge } from "@/design-system/components/ui/badge";
 import { Button } from "@/design-system/components/ui/button";
 import { Card } from "@/design-system/components/ui/card";
 import type { ResearchStatusView } from "@/modules/research/application/research-dto";
-import { VoiceSessionWidget } from "@/components/voice/voice-session-widget";
 
-type ResearchPreparationProps = { leadId: string; executionId: string; initialRunId: string | null; visitorName: string };
+type ResearchPreparationProps = { leadId: string; executionId: string; initialRunId: string | null; onStartConversation: () => void };
 
 export function ResearchPreparation({ initialRunId: _initialRunId, ...props }: ResearchPreparationProps) {
   const [queryClient] = useState(() => new QueryClient());
   return <QueryClientProvider client={queryClient}><PreparationContent {...props} /></QueryClientProvider>;
 }
 
-function PreparationContent({ leadId, executionId, visitorName }: Omit<ResearchPreparationProps, "initialRunId">) {
+function PreparationContent({ leadId, executionId, onStartConversation }: Omit<ResearchPreparationProps, "initialRunId">) {
   const [retrying, setRetrying] = useState(false);
   const [retryError, setRetryError] = useState<string | null>(null);
   const statusQuery = useQuery<ResearchStatusView>({
@@ -37,11 +36,10 @@ function PreparationContent({ leadId, executionId, visitorName }: Omit<ResearchP
     setRetryError(null);
     try {
       const response = await fetch(`/api/leads/${leadId}/research`, { method: "POST" });
-      const payload = await response.json().catch(() => null) as { error?: string } | null;
-      if (!response.ok) throw new Error(payload?.error ?? "Não foi possível iniciar uma nova pesquisa.");
+      if (!response.ok) throw new Error("Não foi possível tentar novamente.");
       await statusQuery.refetch();
     } catch (error) {
-      setRetryError(error instanceof Error ? error.message : "Não foi possível iniciar uma nova pesquisa.");
+      setRetryError(error instanceof Error ? error.message : "Não foi possível tentar novamente.");
     } finally {
       setRetrying(false);
     }
@@ -51,54 +49,77 @@ function PreparationContent({ leadId, executionId, visitorName }: Omit<ResearchP
   const failed = status?.researchStatus === "failed" || status?.researchStatus === "cancelled" ||
     (status !== undefined && ["ready", "partial"].includes(status.researchStatus) && !status.isReadyForVoice) || statusQuery.isError;
   const ready = status?.isReadyForVoice === true;
+  const isPreparing = !failed && !ready;
   const displayedStatus: ResearchStatusView["researchStatus"] = failed ? "failed" : status?.researchStatus ?? "queued";
+  const preparationMessage = messageFor(status?.researchStatus ?? "queued", statusQuery.isLoading, statusQuery.isError, failed);
   return (
-    <Card className="record-card preparation-card">
+    <Card className="record-card preparation-card" aria-busy={isPreparing}>
       <div className="mb-6 flex flex-wrap gap-2">
-        <Badge variant="secondary">Preparação do atendimento</Badge>
+        <Badge variant="secondary">Seu atendimento</Badge>
         <Badge variant={failed ? "destructive" : ready ? "default" : "outline"}>
+          {isPreparing && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-current" aria-hidden="true" />}
           {statusLabel(displayedStatus)}
         </Badge>
       </div>
       <div aria-live="polite">
-        <h2>{failed ? "Não conseguimos preparar seu atendimento." : ready ? "Seu atendimento está pronto." : "Estamos preparando seu atendimento."}</h2>
-        <p>{messageFor(status?.researchStatus ?? "queued", statusQuery.isLoading, statusQuery.isError, failed)}</p>
-      </div>
-      <div className="preparation-meta" aria-label="Detalhes da preparação">
-        <span>Execução: <code>{executionId}</code></span>
-        {status?.durationMs !== null && status?.durationMs !== undefined && <span>Tempo: {formatDuration(status.durationMs)}</span>}
+        {failed ? (
+          <PreparationStatus state="failed" message={preparationMessage} />
+        ) : (
+          <PreparationStatus state={ready ? "ready" : "preparing"} message={preparationMessage} />
+        )}
       </div>
       {failed ? (
         <div className="preparation-action">
-          <p className="field-error" role="alert">{retryError ?? status?.error ?? statusQuery.error?.message ?? "Falha sem diagnóstico disponível."}</p>
+          {retryError && <p className="field-error" role="alert">{retryError}</p>}
           <Button type="button" variant="brand" size="lg" onClick={retryResearch} disabled={retrying}>
-            {retrying ? "Tentando novamente…" : "Preparar atendimento novamente"}
+            {retrying ? "Tentando novamente…" : "Tentar novamente"}
           </Button>
         </div>
       ) : ready ? (
-        <VoiceSessionWidget leadId={leadId} visitorName={visitorName} />
+        <div className="preparation-action">
+          <Button type="button" variant="brand" size="lg" onClick={onStartConversation}>Iniciar conversa por voz</Button>
+        </div>
       ) : (
-        <p className="form-note">A página atualiza automaticamente enquanto o worker processa o job.</p>
+        <p className="form-note">Aguarde mais um instante. Avisaremos quando estiver tudo pronto.</p>
       )}
     </Card>
   );
 }
 
+function PreparationStatus({ state, message }: { state: "preparing" | "ready" | "failed"; message: string }) {
+  const ready = state === "ready";
+  const failed = state === "failed";
+  return (
+    <div className={`preparation-status ${ready ? "is-ready" : failed ? "is-failed" : "is-preparing"}`} role="status">
+      <div className="preparation-indicator" aria-hidden="true">
+        {failed ? (
+          <span className="preparation-failure-mark">×</span>
+        ) : (
+          <>
+            <span className={`preparation-spinner ${ready ? "is-fading" : ""}`} />
+            <span className={`preparation-checkmark ${ready ? "is-visible" : ""}`}>✓</span>
+          </>
+        )}
+      </div>
+      <div className="preparation-status-copy">
+        <h2>{ready ? "Tudo pronto!" : failed ? "Não foi possível preparar seu atendimento." : "Aguarde enquanto preparamos seu atendimento."}</h2>
+        <p>{ready ? "Sua conversa está pronta para começar." : message}</p>
+      </div>
+    </div>
+  );
+}
+
 function statusLabel(status: ResearchStatusView["researchStatus"]): string {
-  const labels: Record<ResearchStatusView["researchStatus"], string> = { queued: "Preparando", running: "Preparando", ready: "Pronto", partial: "Pronto com contexto limitado", failed: "Indisponível", cancelled: "Cancelado" };
+  const labels: Record<ResearchStatusView["researchStatus"], string> = { queued: "Preparando", running: "Preparando", ready: "Pronto", partial: "Pronto", failed: "Indisponível", cancelled: "Indisponível" };
   return labels[status];
 }
 
 function messageFor(status: ResearchStatusView["researchStatus"], loading: boolean, error: boolean, failed: boolean): string {
-  if (error) return "Não foi possível consultar o estado da preparação.";
-  if (failed) return "O briefing desta execução não está disponível. Você pode tentar preparar o atendimento novamente.";
-  if (loading) return "Estamos preparando seu atendimento.";
-  if (status === "queued") return "Seu atendimento será liberado assim que o contexto estiver pronto.";
-  if (status === "running") return "Estamos organizando o contexto para uma conversa mais útil.";
-  if (status === "partial") return "O atendimento seguirá com o contexto disponível e esclarecerá o que faltar na conversa.";
-  return "";
-}
-
-function formatDuration(durationMs: number): string {
-  return durationMs < 1_000 ? `${durationMs} ms` : `${(durationMs / 1_000).toFixed(1)} s`;
+  if (error) return "Não foi possível atualizar o atendimento agora.";
+  if (failed) return "Não foi possível preparar seu atendimento agora. Tente novamente em instantes.";
+  if (loading) return "Aguarde enquanto preparamos seu atendimento.";
+  if (status === "queued") return "Estamos cuidando dos últimos preparativos.";
+  if (status === "running") return "Estamos organizando tudo para você.";
+  if (status === "partial") return "Estamos finalizando os preparativos para a conversa.";
+  return "Seu atendimento está pronto para começar.";
 }

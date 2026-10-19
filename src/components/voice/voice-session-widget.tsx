@@ -15,22 +15,26 @@ type PreparedVoiceSession = {
   dynamicVariables: Record<string, string | number | boolean>;
 };
 
-type VoiceWidgetState = "idle" | "authorizing" | "connecting" | "active" | "ending" | "completed" | "abandoned" | "failed";
+type VoiceWidgetState = "preparing" | "idle" | "authorizing" | "connecting" | "active" | "ending" | "completed" | "abandoned" | "failed";
 
 type VoiceUiError = { kind: VoiceUiErrorKind; message: string };
+type ConversationLine = { id: number; role: "agent" | "user"; text: string };
 
-export function VoiceSessionWidget({ leadId, visitorName }: { leadId: string; visitorName: string }) {
-  return <ConversationProvider><VoiceSessionContent leadId={leadId} visitorName={visitorName} /></ConversationProvider>;
+export function VoiceSessionWidget({ leadId, visitorName, autoStart = false }: { leadId: string; visitorName: string; autoStart?: boolean }) {
+  return <ConversationProvider><VoiceSessionContent leadId={leadId} visitorName={visitorName} autoStart={autoStart} /></ConversationProvider>;
 }
 
-function VoiceSessionContent({ leadId, visitorName }: { leadId: string; visitorName: string }) {
-  const [state, setState] = useState<VoiceWidgetState>("idle");
+function VoiceSessionContent({ leadId, visitorName, autoStart }: { leadId: string; visitorName: string; autoStart: boolean }) {
+  const [state, setState] = useState<VoiceWidgetState>("preparing");
   const [error, setError] = useState<VoiceUiError | null>(null);
   const [prepared, setPrepared] = useState<PreparedVoiceSession | null>(null);
-  const [lastMessage, setLastMessage] = useState<string | undefined>();
+  const [conversationLines, setConversationLines] = useState<ConversationLine[]>([]);
+  const [streamingAgentText, setStreamingAgentText] = useState("");
   const stateRef = useRef<VoiceWidgetState>(state);
   const sessionIdRef = useRef<string | null>(null);
   const endingRef = useRef(false);
+  const nextLineIdRef = useRef(0);
+  const autoStartStartedRef = useRef(false);
 
   const sendBrowserEvent = useCallback((event: "connecting" | "connected" | "finalizing" | "abandoned" | "failed" | "disconnected", reason?: string) => {
     const voiceSessionId = sessionIdRef.current;
@@ -66,12 +70,55 @@ function VoiceSessionContent({ leadId, visitorName }: { leadId: string; visitorN
     sendBrowserEvent("failed", "O SDK de voz informou uma falha de conexão.");
   }, [sendBrowserEvent]);
 
-  const { startSession, endSession, isMuted, setMuted, isSpeaking, isListening, mode, status, message } = useConversation({
+  const { startSession, endSession, isMuted, setMuted, isSpeaking, isListening, mode, status } = useConversation({
     onConnect: handleConnect,
     onDisconnect: handleDisconnect,
     onError: handleError,
-    onMessage: ({ message: nextMessage }) => setLastMessage(nextMessage),
+    onMessage: ({ message: nextMessage, role }) => {
+      const cleanedMessage = cleanDisplayedVoiceText(nextMessage);
+      if (!cleanedMessage) return;
+      setConversationLines((currentLines) => [...currentLines, {
+        id: nextLineIdRef.current++,
+        role: role === "user" ? "user" : "agent",
+        text: cleanedMessage,
+      }]);
+      setStreamingAgentText("");
+    },
+    onAgentChatResponsePart: ({ text: nextText, type }) => {
+      if (typeof nextText !== "string" || !nextText) return;
+      if (type === "start") setStreamingAgentText(cleanDisplayedVoiceText(nextText));
+      if (type === "delta") setStreamingAgentText((currentText) => cleanDisplayedVoiceText(currentText + nextText));
+    },
   });
+
+  const requestPreparedSession = useCallback(async (): Promise<PreparedVoiceSession> => {
+    const response = await fetch(`/api/leads/${leadId}/voice/session`, { method: "POST", credentials: "same-origin" });
+    const payload = await response.json() as Partial<PreparedVoiceSession> & { error?: string; code?: string };
+    if (!response.ok) throw new VoiceRequestError(response.status, payload.error ?? "Não foi possível preparar a conversa.", payload.code);
+    if (!isPreparedSession(payload)) throw new VoiceRequestError(500, "A preparação da conversa veio incompleta.");
+    return payload;
+  }, [leadId]);
+
+  const prepareAgentSession = useCallback(async (): Promise<PreparedVoiceSession | null> => {
+    setError(null);
+    setState("preparing");
+    try {
+      const payload = await requestPreparedSession();
+      setPrepared(payload);
+      sessionIdRef.current = payload.voiceSessionId;
+      setState("idle");
+      return payload;
+    } catch (caughtError) {
+      const nextError = toVoiceUiError(caughtError);
+      setError(nextError);
+      setState("failed");
+      return null;
+    }
+  }, [requestPreparedSession]);
+
+  useEffect(() => {
+    void prepareAgentSession();
+  }, [prepareAgentSession]);
 
   useEffect(() => { stateRef.current = state; }, [state]);
 
@@ -83,7 +130,10 @@ function VoiceSessionContent({ leadId, visitorName }: { leadId: string; visitorN
         if (!response.ok) return;
         const payload = await response.json() as { status?: string };
         if (payload.status === "completed") setState("completed");
-        if (payload.status === "failed") setState("failed");
+        if (payload.status === "failed") {
+          setError({ kind: "network", message: "Não foi possível confirmar o encerramento da conversa. Tente novamente." });
+          setState("failed");
+        }
         if (payload.status === "abandoned") setState("abandoned");
       } catch { /* A próxima consulta tenta novamente. */ }
     }, 1_500);
@@ -106,20 +156,19 @@ function VoiceSessionContent({ leadId, visitorName }: { leadId: string; visitorN
     setState("authorizing");
     endingRef.current = false;
     try {
+      const sessionToStart = state === "completed" || state === "abandoned" || !prepared
+        ? await prepareAgentSession()
+        : prepared;
+      if (!sessionToStart) return;
       await requestMicrophone();
-      const response = await fetch(`/api/leads/${leadId}/voice/session`, { method: "POST", credentials: "same-origin" });
-      const payload = await response.json() as Partial<PreparedVoiceSession> & { error?: string; code?: string };
-      if (!response.ok) throw new VoiceRequestError(response.status, payload.error ?? "Não foi possível autorizar a conversa.", payload.code);
-      if (!isPreparedSession(payload)) throw new VoiceRequestError(500, "A autorização da conversa veio incompleta.");
-      setPrepared(payload);
-      sessionIdRef.current = payload.voiceSessionId;
+      sessionIdRef.current = sessionToStart.voiceSessionId;
       sendBrowserEvent("connecting", "Visitante autorizou o início da conversa.");
       setState("connecting");
       startSession({
-        conversationToken: payload.conversationToken,
+        conversationToken: sessionToStart.conversationToken,
         connectionType: "webrtc",
-        dynamicVariables: payload.dynamicVariables,
-        userId: payload.voiceSessionId,
+        dynamicVariables: sessionToStart.dynamicVariables,
+        userId: sessionToStart.voiceSessionId,
       });
     } catch (caughtError) {
       const nextError = toVoiceUiError(caughtError);
@@ -128,6 +177,12 @@ function VoiceSessionContent({ leadId, visitorName }: { leadId: string; visitorN
       sendBrowserEvent("failed", nextError.message);
     }
   }
+
+  useEffect(() => {
+    if (!autoStart || state !== "idle" || !prepared || autoStartStartedRef.current) return;
+    autoStartStartedRef.current = true;
+    void startVoiceSession();
+  }, [autoStart, prepared, state]);
 
   function finishVoiceSession() {
     endingRef.current = true;
@@ -140,12 +195,18 @@ function VoiceSessionContent({ leadId, visitorName }: { leadId: string; visitorN
     setPrepared(null);
     sessionIdRef.current = null;
     endingRef.current = false;
+    autoStartStartedRef.current = false;
     setError(null);
-    setState("idle");
+    void prepareAgentSession();
   }
 
-  const canStart = state === "idle" || state === "failed" || state === "abandoned" || state === "completed";
-  const statusMessage = statusText(state, status, visitorName);
+  const canStart = state === "idle" || state === "failed" || state === "abandoned";
+  const statusMessage = statusText(state, status);
+  const orbState = isSpeaking ? "is-speaking" : isListening ? "is-listening" : state === "connecting" || state === "preparing" ? "is-connecting" : "";
+  const showStartButton = canStart && (!autoStart || state === "abandoned");
+
+  if (state === "ending") return <ConversationEndingState />;
+  if (state === "completed") return <ConversationCompletedState />;
 
   return (
     <Card className="voice-session-card record-card">
@@ -154,34 +215,84 @@ function VoiceSessionContent({ leadId, visitorName }: { leadId: string; visitorN
         <Badge variant={state === "failed" ? "destructive" : state === "active" ? "default" : "outline"}>{statusLabel(state)}</Badge>
       </div>
       <h2>Converse com o atendimento, {visitorName.split(" ")[0]}.</h2>
-      <p className="text-sm text-muted-foreground">O contexto preparado é enviado à sessão autorizada. A conversa só começa após sua ação e permissão do microfone.</p>
-      <div className="voice-visualizer" aria-hidden="true">
-        {Array.from({ length: 9 }, (_, index) => <span className={isSpeaking || isListening ? "voice-wave-bar is-live" : "voice-wave-bar"} key={index} />)}
+      <p className="text-sm text-muted-foreground">Fale naturalmente. Você verá as mensagens do atendimento enquanto a conversa acontece.</p>
+      <div className="voice-orb-stage">
+        <div className={`voice-orb ${orbState}`} role="img" aria-label={isSpeaking ? "O atendimento está falando" : isListening ? "O atendimento está ouvindo" : "Aguardando a conversa"}>
+          <span className="voice-orb-core" />
+        </div>
+        <span className="form-note">{statusMessage}</span>
       </div>
-      <div className="voice-status" aria-live="polite">
-        <strong>{statusMessage}</strong>
-        {lastMessage && <span className="voice-last-message">Última mensagem: {lastMessage}</span>}
-        {message && state === "active" && <span className="voice-last-message">{message}</span>}
+      <div className="voice-transcript" aria-live="polite" aria-label="Mensagens da conversa">
+        {conversationLines.length === 0 && !streamingAgentText && <p className="voice-transcript-empty">As mensagens aparecerão aqui quando a conversa começar.</p>}
+        {conversationLines.slice(-8).map((line) => (
+          <p className={`voice-transcript-line ${line.role === "agent" ? "is-agent" : "is-user"}`} key={line.id}>
+            <strong>{line.role === "agent" ? "Atendimento" : "Você"}</strong>
+            <span>{line.text}</span>
+          </p>
+        ))}
+        {streamingAgentText && (
+          <p className="voice-transcript-line is-agent is-streaming">
+            <strong>Atendimento</strong>
+            <span>{streamingAgentText}</span>
+          </p>
+        )}
       </div>
-      {error ? <MicPermissionGuide kind={error.kind} message={error.message} leadId={leadId} onRetry={retry} /> : (
+      {error ? <MicPermissionGuide kind={error.kind} message={error.message} onRetry={retry} /> : (
         <div className="voice-actions">
-          {canStart && <Button type="button" variant="brand" size="lg" onClick={startVoiceSession}>{state === "completed" ? "Iniciar nova conversa" : "Iniciar conversa por voz"}</Button>}
+          {showStartButton && <Button type="button" variant="brand" size="lg" onClick={startVoiceSession}>Iniciar conversa por voz</Button>}
           {state === "active" && <>
             <Button type="button" variant="outline" size="lg" onClick={() => setMuted(!isMuted)}>{isMuted ? "Ativar microfone" : "Silenciar microfone"}</Button>
             <Button type="button" variant="destructive" size="lg" onClick={finishVoiceSession}>Encerrar conversa</Button>
           </>}
           {state === "connecting" && <Button type="button" variant="destructive" size="lg" onClick={finishVoiceSession}>Cancelar conexão</Button>}
-          {state === "ending" && <span className="form-note">Encerrando a conexão e aguardando a confirmação segura do provedor.</span>}
+          {state === "preparing" && <span className="form-note">Finalizando os preparativos…</span>}
         </div>
       )}
-      <p className="form-note">Modo atual: {mode === "speaking" ? "agente falando" : "aguardando sua fala"}.</p>
+      {state === "active" && <p className="form-note">{mode === "speaking" ? "O atendimento está falando." : "Aguardando sua fala."}</p>}
+    </Card>
+  );
+}
+
+function ConversationEndingState() {
+  return (
+    <Card className="voice-session-card record-card">
+      <div className="preparation-status voice-closing-status is-preparing" role="status" aria-live="polite">
+        <div className="preparation-indicator" aria-hidden="true">
+          <span className="preparation-spinner" />
+        </div>
+        <div className="preparation-status-copy">
+          <p>Aguarde enquanto encerramos a conversa</p>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function ConversationCompletedState() {
+  return (
+    <Card className="voice-session-card record-card">
+      <div className="preparation-status voice-closing-status is-ready" role="status" aria-live="polite">
+        <div className="preparation-indicator" aria-hidden="true">
+          <span className="preparation-checkmark is-visible">✓</span>
+        </div>
+        <div className="preparation-status-copy">
+          <p>Obrigado, nosso time entrará em contato com você!</p>
+        </div>
+      </div>
     </Card>
   );
 }
 
 async function requestMicrophone(): Promise<void> {
   if (!navigator.mediaDevices?.getUserMedia) throw new VoiceRequestError(0, "Seu navegador não oferece acesso seguro ao microfone.", "browser");
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      autoGainControl: true,
+      channelCount: { ideal: 1 },
+      echoCancellation: true,
+      noiseSuppression: true,
+    },
+  });
   stream.getTracks().forEach((track) => track.stop());
 }
 
@@ -201,26 +312,35 @@ function toVoiceUiError(error: unknown): VoiceUiError {
   if (error instanceof DOMException && ["NotAllowedError", "PermissionDeniedError"].includes(error.name)) return { kind: "permission", message: "O navegador não liberou o microfone para esta conversa." };
   if (error instanceof DOMException && error.name === "NotFoundError") return { kind: "missing", message: "Nenhum microfone foi encontrado no dispositivo." };
   if (error instanceof VoiceRequestError) {
-    if (error.code === "unauthorized" || error.status === 401) return { kind: "credential", message: error.message };
-    if (error.code === "research_pending" || error.code === "briefing_missing") return { kind: "generic", message: error.message };
-    if (error.status >= 500 || error.code === "configuration" || error.code === "unavailable") return { kind: "network", message: error.message };
-    return { kind: "generic", message: error.message };
+    if (error.code === "unauthorized" || error.status === 401) return { kind: "credential", message: "Não foi possível validar seu atendimento. Atualize a página e tente novamente." };
+    if (error.code === "research_pending" || error.code === "briefing_missing") return { kind: "generic", message: "Ainda estamos preparando seu atendimento. Tente novamente em instantes." };
+    if (error.status >= 500 || error.code === "configuration" || error.code === "unavailable") return { kind: "network", message: "Não foi possível iniciar seu atendimento agora. Tente novamente em instantes." };
+    return { kind: "generic", message: "Não foi possível iniciar seu atendimento. Tente novamente." };
   }
   return { kind: "network", message: "Não foi possível acessar o microfone ou conectar a conversa. Confira a rede e tente novamente." };
 }
 
 function statusLabel(state: VoiceWidgetState): string {
-  const labels: Record<VoiceWidgetState, string> = { idle: "Pronto", authorizing: "Autorizando", connecting: "Conectando", active: "Em conversa", ending: "Finalizando", completed: "Concluída", abandoned: "Abandonada", failed: "Falhou" };
+  const labels: Record<VoiceWidgetState, string> = { preparing: "Preparando", idle: "Pronto", authorizing: "Preparando microfone", connecting: "Conectando", active: "Em conversa", ending: "Finalizando", completed: "Concluída", abandoned: "Interrompida", failed: "Não foi possível iniciar" };
   return labels[state];
 }
 
-function statusText(state: VoiceWidgetState, sdkStatus: string, visitorName: string): string {
-  if (state === "idle") return "Seu atendimento está pronto.";
-  if (state === "authorizing") return "Validando sessão e preparando o microfone…";
+function statusText(state: VoiceWidgetState, sdkStatus: string): string {
+  if (state === "preparing") return "Finalizando os preparativos…";
+  if (state === "idle") return "Tudo pronto para iniciar.";
+  if (state === "authorizing") return "Preparando o microfone…";
   if (state === "connecting") return "Conectando o atendimento…";
   if (state === "active") return `${sdkStatus === "connected" ? "Conexão estabelecida." : "Conversa em andamento."} Fale quando estiver pronto.`;
-  if (state === "ending") return `Obrigado, ${visitorName.split(" ")[0]}. A conversa está sendo finalizada.`;
-  if (state === "completed") return "Conversa finalizada e confirmada pelo provedor.";
-  if (state === "abandoned") return "A conversa foi interrompida antes da confirmação do provedor.";
+  if (state === "abandoned") return "A conversa foi interrompida antes de ser concluída.";
   return "A conversa não pôde ser concluída.";
+}
+
+function cleanDisplayedVoiceText(text: string): string {
+  return text
+    .replace(/\bThe user said\b[\s\S]*$/i, "")
+    .replace(/\[[^\]\r\n]{1,48}\]\s*/g, "")
+    .replace(/^\s*[a-z][\w-]{0,32}\]\s*/i, "")
+    .replace(/\[[^\]\r\n]{0,48}$/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }

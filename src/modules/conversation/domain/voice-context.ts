@@ -34,8 +34,8 @@ export function compileVoiceContext(input: {
   const gaps = input.briefing.gaps.map((gap) => gap.prompt.trim()).filter(Boolean);
   const verifiedContext = input.briefing.facts.map((fact) => formatFact(fact));
   const openingInstruction = sector
-    ? `Cumprimente ${firstName(input.lead.fullName)}, identifique-se como assistente virtual da Atlas, reconheça o setor confirmado (${sector}) e pergunte o que motivou o interesse agora.`
-    : `Cumprimente ${firstName(input.lead.fullName)}, identifique-se como assistente virtual da Atlas, agradeça o interesse na plataforma financeira e peça o contexto atual da empresa.`;
+    ? `Cumprimente ${firstName(input.lead.fullName)}, identifique-se como Anderson, da Atlas, reconheça o setor confirmado (${sector}) e pergunte o que motivou o interesse agora.`
+    : `Cumprimente ${firstName(input.lead.fullName)}, identifique-se como Anderson, da Atlas, agradeça o interesse na plataforma financeira e peça o contexto atual da empresa.`;
   const spicedPrompt = buildVoiceQualificationPrompt({
     visitorName: input.lead.fullName,
     companyName: input.lead.company,

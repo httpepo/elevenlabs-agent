@@ -105,8 +105,8 @@ function mapMeetingAttempt(row: Row): MeetingAttempt {
     voiceSessionId: nullableString(row.voice_session_id),
     bookingIntentId: nullableString(row.booking_intent_id),
     slotOfferTokenHash: nullableString(row.slot_offer_token_hash),
-    start: nullableString(row.start_at),
-    end: nullableString(row.end_at),
+    start: nullableTimestamp(row.start_at),
+    end: nullableTimestamp(row.end_at),
     availabilityFrom: nullableString(row.availability_from),
     availabilityUntil: nullableString(row.availability_until),
     previousStatus: row.previous_status ? String(row.previous_status) as MeetingAttemptStatus : null,
@@ -115,12 +115,21 @@ function mapMeetingAttempt(row: Row): MeetingAttempt {
     httpStatus: row.http_status === null || row.http_status === undefined ? null : Number(row.http_status),
     bookingPayload: parseJson(row.booking_payload, {}),
     transportDiagnostic: nullableString(row.transport_diagnostic),
-    createdAt: new Date(String(row.created_at)).toISOString(),
+    createdAt: toIsoTimestamp(row.created_at),
   };
 }
 
 function nullableString(value: unknown): string | null {
   return value === null || value === undefined ? null : String(value);
+}
+
+function nullableTimestamp(value: unknown): string | null {
+  return value === null || value === undefined ? null : toIsoTimestamp(value);
+}
+
+function toIsoTimestamp(value: unknown): string {
+  const date = value instanceof Date ? value : new Date(String(value));
+  return date.toISOString();
 }
 
 function parseJson<T>(value: unknown, fallback: T): T {

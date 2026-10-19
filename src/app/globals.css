@@ -105,19 +105,70 @@
   .footer-company-details { @apply mt-4 grid gap-2 text-xs leading-relaxed text-muted-foreground; }
   .footer-company-details p { @apply m-0; }
   .preparation-card { @apply border-primary/40; }
-  .preparation-summary { @apply border-l-2 border-primary pl-3 text-sm text-foreground; }
-  .preparation-meta { @apply my-6 grid gap-2 border-y py-4 text-xs text-muted-foreground sm:grid-cols-3; }
-  .preparation-meta code { @apply text-foreground; }
+  .preparation-status { @apply my-7 flex items-center gap-5 rounded-xl border border-primary/30 bg-background p-5; }
+  .preparation-indicator { @apply relative flex size-16 shrink-0 items-center justify-center rounded-full border border-primary/30; }
+  .preparation-spinner { @apply absolute size-10 rounded-full border-2 border-primary/20 border-t-primary; animation: preparation-spin 1s linear infinite; }
+  .preparation-spinner.is-fading { animation: preparation-spinner-out 500ms ease forwards; }
+  .preparation-checkmark { @apply absolute flex size-10 scale-75 items-center justify-center rounded-full bg-primary text-2xl font-semibold text-primary-foreground; opacity: 0; transition: opacity 350ms ease, transform 350ms ease; }
+  .preparation-checkmark.is-visible { @apply scale-100; opacity: 1; transition-delay: 220ms; }
+  .preparation-failure-mark { @apply absolute flex size-10 items-center justify-center rounded-full bg-destructive text-3xl font-semibold leading-none text-destructive-foreground; }
+  .preparation-status-copy { @apply grid gap-1; }
+  .preparation-status-copy h2 { @apply m-0 text-xl; }
+  .preparation-status-copy p { @apply m-0 text-sm text-muted-foreground; }
   .preparation-action { @apply grid gap-3; }
   .voice-session-card { @apply border-primary/40; }
-  .voice-visualizer { @apply my-7 flex h-16 items-center justify-center gap-1.5 rounded-md border bg-background px-6; }
-  .voice-wave-bar { @apply block h-3 w-1 rounded-full bg-muted-foreground/40 transition-all; }
-  .voice-wave-bar:nth-child(2), .voice-wave-bar:nth-child(8) { @apply h-6; }
-  .voice-wave-bar:nth-child(3), .voice-wave-bar:nth-child(7) { @apply h-9; }
-  .voice-wave-bar:nth-child(4), .voice-wave-bar:nth-child(6) { @apply h-12; }
-  .voice-wave-bar:nth-child(5) { @apply h-16; }
-  .voice-wave-bar.is-live { @apply animate-pulse bg-primary; }
-  .voice-status { @apply grid gap-2 text-sm; }
-  .voice-last-message { @apply text-xs text-muted-foreground; }
+  .voice-orb-stage { @apply my-8 grid justify-items-center gap-3; }
+  .voice-orb { @apply relative flex size-40 items-center justify-center rounded-full border border-primary/30 bg-primary/5; box-shadow: 0 0 0 1px hsl(var(--primary) / 0.08); }
+  .voice-orb::before { @apply absolute inset-3 rounded-full border border-primary/15 content-['']; }
+  .voice-orb::after { @apply absolute -inset-2 rounded-full border border-primary/10 content-['']; opacity: 0.35; }
+  .voice-orb.is-connecting { animation: voice-orb-breathe 2.4s ease-in-out infinite; }
+  .voice-orb.is-listening { animation: voice-orb-listening 2.8s ease-in-out infinite; }
+  .voice-orb.is-speaking { animation: voice-orb-speaking 1.4s ease-in-out infinite; }
+  .voice-orb.is-speaking::after { animation: voice-orb-ring 1.8s ease-out infinite; }
+  .voice-orb-core { @apply relative size-20 rounded-full bg-primary; box-shadow: 0 0 20px hsl(var(--primary) / 0.24); }
+  .voice-transcript { @apply my-6 grid max-h-72 gap-3 overflow-y-auto rounded-xl border bg-background p-4; }
+  .voice-transcript-empty { @apply m-0 text-sm text-muted-foreground; }
+  .voice-transcript-line { @apply m-0 grid gap-1 rounded-lg border-l-2 px-3 py-2 text-sm; }
+  .voice-transcript-line strong { @apply text-xs font-medium text-primary; }
+  .voice-transcript-line span { @apply text-foreground; }
+  .voice-transcript-line.is-agent { @apply border-primary bg-primary/5; }
+  .voice-transcript-line.is-user { @apply border-muted-foreground bg-muted/30; }
+  .voice-transcript-line.is-streaming span::after { content: "▋"; @apply ml-0.5 animate-pulse text-primary; }
   .voice-actions { @apply mt-6 flex flex-wrap gap-3; }
+}
+
+@keyframes preparation-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes preparation-spinner-out {
+  from { opacity: 1; transform: scale(1) rotate(0deg); }
+  to { opacity: 0; transform: scale(0.72) rotate(180deg); }
+}
+
+@keyframes voice-orb-breathe {
+  0%, 100% { transform: scale(0.99); }
+  50% { transform: scale(1.015); }
+}
+
+@keyframes voice-orb-listening {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.018); }
+}
+
+@keyframes voice-orb-speaking {
+  0%, 100% { transform: scale(0.985); }
+  50% { transform: scale(1.025); }
+}
+
+@keyframes voice-orb-ring {
+  from { opacity: 0.28; transform: scale(0.98); }
+  to { opacity: 0; transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preparation-spinner { animation: none; }
+  .preparation-spinner.is-fading { animation: preparation-spinner-out 1ms linear forwards; }
+  .preparation-checkmark { transition-duration: 1ms; }
+  .voice-orb.is-connecting, .voice-orb.is-listening, .voice-orb.is-speaking, .voice-orb.is-speaking::after { animation: none; }
 }
