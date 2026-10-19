@@ -1,7 +1,20 @@
-import type { LeadForm } from "../../leads/domain/lead.ts";
-import type { ResearchResult } from "../domain/briefing.ts";
+import type { ResearchSearchResult } from "../domain/briefing.ts";
 
-// Sem implementação: Tavily/Gemini serão conectados por adaptadores.
+export type ResearchProviderInput = {
+  queries: string[];
+  timeoutMs: number;
+};
+
 export interface ResearchProvider {
-  research(lead: LeadForm): Promise<ResearchResult>;
+  search(input: ResearchProviderInput): Promise<ResearchSearchResult[]>;
+}
+
+export class ResearchProviderError extends Error {
+  readonly kind: "configuration" | "timeout" | "failed";
+
+  constructor(message: string, kind: ResearchProviderError["kind"]) {
+    super(message);
+    this.name = "ResearchProviderError";
+    this.kind = kind;
+  }
 }
