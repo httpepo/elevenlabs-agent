@@ -7,6 +7,7 @@ export const tokens = {
     "light": {
       "background": "#ffffff",
       "foreground": "#242424",
+      "footerGlow": "#ffe2a8",
       "border": "#e6e4e0",
       "card": "#ffffff",
       "cardForeground": "#242424",
@@ -41,6 +42,7 @@ export const tokens = {
     "dark": {
       "background": "#000000",
       "foreground": "#ffffff",
+      "footerGlow": "#ffe2a8",
       "border": "#1f1f1f",
       "card": "#0f0f0f",
       "cardForeground": "#ffffff",

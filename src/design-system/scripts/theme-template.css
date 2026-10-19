@@ -61,6 +61,7 @@
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
+  --color-footer-glow: hsl(var(--footer-glow));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
@@ -161,6 +162,7 @@
 
   --background: __DS_LIGHT_BACKGROUND__;
   --foreground: __DS_LIGHT_FOREGROUND__;
+  --footer-glow: __DS_LIGHT_FOOTERGLOW__;
   --border: __DS_LIGHT_BORDER__;
   --card: __DS_LIGHT_CARD__;
   --card-foreground: __DS_LIGHT_CARDFOREGROUND__;
@@ -229,6 +231,7 @@
 
   --background: __DS_DARK_BACKGROUND__;
   --foreground: __DS_DARK_FOREGROUND__;
+  --footer-glow: __DS_DARK_FOOTERGLOW__;
   --border: __DS_DARK_BORDER__;
   --card: __DS_DARK_CARD__;
   --card-foreground: __DS_DARK_CARDFOREGROUND__;

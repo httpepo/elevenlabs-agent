@@ -25,3 +25,11 @@ pnpm design:tokens
 
 Depois, valide com `pnpm typecheck` e `pnpm build`.
 
+
+## Rodapé autoral
+
+`src/components/site-footer.tsx` compõe o rodapé enxuto do projeto autoral,
+reutilizando o logo local, tipografia, espaçamentos e o papel decorativo
+`footerGlow` (`--footer-glow`) definido em `tokens.json`. O efeito usa
+gradientes CSS estáticos, sem canvas, fontes remotas ou animações. Texto, links
+e bordas usam `foreground`, `muted-foreground` e `border`.

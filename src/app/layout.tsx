@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/design-system/components/ui/badge";
 import { Button } from "@/design-system/components/ui/button";
+import { SiteFooter } from "@/components/site-footer";
 import atlasLogo from "@/design-system/assets/brand/atlas-white.svg";
 import "./globals.css";
 
@@ -25,7 +26,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           
         </header>
         <main>{children}</main>
-        <footer className="site-footer">Qualificação comercial por voz comercial · Primeira etapa de desenvolvimento</footer>
+        <SiteFooter />
       </body>
     </html>
   );

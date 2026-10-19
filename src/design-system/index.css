@@ -221,6 +221,7 @@
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
+  --color-footer-glow: hsl(var(--footer-glow));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
@@ -321,6 +322,7 @@
 
   --background: 0 0% 100%;
   --foreground: 0 0% 14.1%;
+  --footer-glow: 40 100% 82.9%;
   --border: 40 10.7% 89%;
   --card: 0 0% 100%;
   --card-foreground: 0 0% 14.1%;
@@ -389,6 +391,7 @@
 
   --background: 0 0% 0%;
   --foreground: 0 0% 100%;
+  --footer-glow: 40 100% 82.9%;
   --border: 0 0% 12.2%;
   --card: 0 0% 5.9%;
   --card-foreground: 0 0% 100%;
