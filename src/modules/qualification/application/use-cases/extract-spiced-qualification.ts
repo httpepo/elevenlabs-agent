@@ -4,9 +4,9 @@ import { createObjectionRecord } from "../../domain/objections/objection-record.
 import { createSpicedDimension, createSpicedQualification, type SpicedDimensionName, type SpicedDimension } from "../../domain/spiced-qualification.ts";
 import { parseTranscript, validateEvidenceRefs, type TranscriptSegment } from "../../domain/transcript.ts";
 import { spicedExtractionSchema, type SpicedExtractionInput } from "../../domain/schemas/spiced-schema.ts";
-import type { LeadProfileCorrection, LeadProfileVersion } from "../../domain/lead-profile-version.ts";
+import type { LeadProfileCorrection, LeadProfileCorrectionField, LeadProfileVersion } from "../../domain/lead-profile-version.ts";
 import type { LeadProfileVersionRepository } from "../../ports/lead-profile-version-repository.ts";
-import type { QualificationExtractor } from "../../ports/qualification-extractor.ts";
+import { QualificationExtractionError, type QualificationExtractor } from "../../ports/qualification-extractor.ts";
 import type { QualificationRepository } from "../../ports/qualification-repository.ts";
 import type { QualificationToolExecution, QualificationToolExecutionRepository } from "../../ports/qualification-tool-execution-repository.ts";
 
@@ -32,12 +32,11 @@ export class ExtractSpicedQualificationUseCase {
     if (existing) return { status: "duplicate", qualificationId: existing.id };
 
     const startedAt = Date.now();
-    const lead = await this.leads.get(input.leadId);
-    if (!lead) throw new Error("Visitante da qualificação não encontrado.");
-    const segments = parseTranscript(input.transcript);
-    if (!segments.length) return this.fail(input, startedAt, "A transcrição não possui segmentos utilizáveis.");
-
     try {
+      const lead = await this.leads.get(input.leadId);
+      if (!lead) throw new Error("Visitante da qualificação não encontrado.");
+      const segments = parseTranscript(input.transcript);
+      if (!segments.length) throw new Error("A transcrição não possui segmentos utilizáveis.");
       const extraction = spicedExtractionSchema.parse(await this.extractor.extract({
         lead: { original: lead.original, normalized: lead.normalized },
         transcriptSegments: segments,
@@ -72,8 +71,14 @@ export class ExtractSpicedQualificationUseCase {
           invalidEvidenceCount: normalized.invalidEvidenceCount,
           objectionCount: normalized.objections.length,
           objections: normalized.objections.map((objection) => ({
+            id: objection.id,
             category: objection.category,
+            originalStatement: objection.originalStatement,
+            response: objection.response,
+            source: objection.source,
+            sourceVersion: objection.sourceVersion,
             status: objection.status,
+            unansweredFollowUp: objection.unansweredFollowUp,
             authorizedClaimIds: objection.authorizedClaimIds,
           })),
           correctionCount: normalized.corrections.length,
@@ -85,7 +90,7 @@ export class ExtractSpicedQualificationUseCase {
         qualificationId: qualification.id,
       };
     } catch (error) {
-      return this.fail(input, startedAt, publicError(error));
+      return this.fail(input, startedAt, error);
     }
   }
 
@@ -95,14 +100,29 @@ export class ExtractSpicedQualificationUseCase {
     corrections: SpicedExtractionInput["profileCorrections"],
     segments: readonly TranscriptSegment[],
   ): Promise<void> {
+    const latest = await this.profileVersions.getLatest(input.leadId);
+    const currentValues = new Map<LeadProfileCorrectionField, string | null>([
+      ["fullName", lead.normalized.fullName],
+      ["company", lead.normalized.company],
+      ["role", null],
+      ["phone", lead.normalized.phone],
+      ["email", lead.normalized.email],
+    ]);
+    for (const change of latest?.changes ?? []) currentValues.set(change.field, change.correctedValue);
+
     const validCorrections = corrections.flatMap((correction) => {
       const evidence = validateEvidenceRefs([correction.evidenceRef], segments);
       if (!evidence.valid.length) return [];
-      if (sameProfileValue(correction.correctedValue, currentProfileValue(lead.normalized, correction.field))) return [];
-      return [{ ...correction, evidenceRef: evidence.valid[0] } satisfies LeadProfileCorrection];
+      const currentValue = currentValues.get(correction.field) ?? correction.originalValue ?? null;
+      if (sameProfileValue(correction.correctedValue, currentValue, correction.field)) return [];
+      currentValues.set(correction.field, correction.correctedValue);
+      return [{
+        ...correction,
+        originalValue: currentValue,
+        evidenceRef: evidence.valid[0],
+      } satisfies LeadProfileCorrection];
     });
     if (!validCorrections.length) return;
-    const latest = await this.profileVersions.getLatest(input.leadId);
     const version: LeadProfileVersion = {
       id: randomUUID(),
       leadId: input.leadId,
@@ -123,8 +143,10 @@ export class ExtractSpicedQualificationUseCase {
     eventType: string;
     idempotencyKey: string;
     transcript: string;
-  }, startedAt: number, message: string) {
-    await this.recordToolExecution({ input, startedAt, status: "failed", output: { error: message } });
+  }, startedAt: number, error: unknown) {
+    const message = publicError(error);
+    const status = error instanceof QualificationExtractionError && error.kind === "timeout" ? "timeout" as const : "failed" as const;
+    await this.recordToolExecution({ input, startedAt, status, output: { error: message } });
     return { status: "failed" as const, error: message };
   }
 
@@ -163,7 +185,11 @@ function normalizeExtraction(extraction: SpicedExtractionInput, segments: readon
     authorizedClaimIds: objection.authorizedClaimIds,
     unansweredFollowUp: objection.unansweredFollowUp,
   }));
-  const corrections = extraction.profileCorrections.filter((correction) => validateEvidenceRefs([correction.evidenceRef], segments).valid.length > 0);
+  const corrections = extraction.profileCorrections.flatMap((correction) => {
+    const evidence = validateEvidenceRefs([correction.evidenceRef], segments);
+    invalidEvidence.count += evidence.invalidCount;
+    return evidence.valid.length ? [{ ...correction, evidenceRef: evidence.valid[0] }] : [];
+  });
   return {
     situation: normalizeDimension("situation", extraction.situation, segments, invalidEvidence),
     pain: normalizeDimension("pain", extraction.pain, segments, invalidEvidence),
@@ -185,7 +211,7 @@ function normalizeDimension<T extends SpicedDimensionName>(
   const evidence = validateEvidenceRefs(raw.evidenceRefs, segments);
   invalidEvidence.count += evidence.invalidCount;
   const unsupportedValue = evidence.invalidCount > 0 ||
-    (["known", "partial"].includes(raw.status) && evidence.valid.length === 0) ||
+    (["known", "partial"].includes(raw.status) && (!raw.value?.trim() || evidence.valid.length === 0)) ||
     (raw.status === "not_asked" && evidence.valid.length > 0);
   return createSpicedDimension({
     dimension: name,
@@ -201,21 +227,19 @@ function normalizeQualificationStatus(extraction: SpicedExtractionInput) {
   return extraction.qualificationStatus;
 }
 
-function currentProfileValue(profile: { fullName: string; company: string; phone: string; email: string }, field: string): string | null {
-  if (field === "fullName") return profile.fullName;
-  if (field === "company") return profile.company;
-  if (field === "phone") return profile.phone;
-  if (field === "email") return profile.email;
-  return null;
-}
-
-function sameProfileValue(left: string, right: string | null): boolean {
+function sameProfileValue(left: string, right: string | null, field: string): boolean {
   if (!right) return false;
-  return normalizeValue(left) === normalizeValue(right);
+  return normalizeProfileValue(left, field) === normalizeProfileValue(right, field);
 }
 
-function normalizeValue(value: string): string {
-  return value.replace(/\D/g, "").toLocaleLowerCase("pt-BR") || value.trim().toLocaleLowerCase("pt-BR");
+function normalizeProfileValue(value: string, field: string): string {
+  if (field === "phone") return value.replace(/\D/g, "");
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLocaleLowerCase("pt-BR");
 }
 
 function sanitizeOutput(output: Record<string, unknown>): Record<string, unknown> {

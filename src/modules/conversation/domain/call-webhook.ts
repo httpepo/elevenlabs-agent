@@ -24,6 +24,10 @@ export type WebhookEvent = {
   processedAt: string | null;
 };
 
+export function webhookIdempotencyKey(input: Pick<VerifiedCallWebhook, "externalCallId" | "eventType">): string {
+  return `call:${input.externalCallId}:type:${input.eventType}`;
+}
+
 export function artifactTypesForWebhook(webhook: VerifiedCallWebhook): ConversationArtifactType[] {
   return [webhook.transcript ? "transcript" : null, webhook.summary ? "summary" : null].filter(
     (type): type is ConversationArtifactType => type !== null,

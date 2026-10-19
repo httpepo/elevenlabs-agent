@@ -16,7 +16,7 @@ export class ListAttendanceOverviewUseCase {
 
   async execute(): Promise<AttendanceOverviewItem[]> {
     const leads = await this.leads.list();
-    return Promise.all(leads.map(async (lead) => {
+    const attendances = await Promise.all(leads.map(async (lead) => {
       const [run, session, qualification, meetings] = await Promise.all([
         this.research.getLatestRun(lead.id, lead.executionId),
         this.conversations.getLatestSession(lead.id, lead.executionId),
@@ -39,6 +39,7 @@ export class ListAttendanceOverviewUseCase {
         },
       } satisfies AttendanceOverviewItem;
     }));
+    return attendances.sort((left, right) => right.submittedAt.localeCompare(left.submittedAt) || left.leadId.localeCompare(right.leadId));
   }
 }
 

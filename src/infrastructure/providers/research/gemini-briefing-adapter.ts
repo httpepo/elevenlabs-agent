@@ -3,7 +3,7 @@ import { getServerEnvironment } from "../../config/env.ts";
 import type { BriefingGenerationInput, GeneratedBriefing, ResearchGap } from "../../../modules/research/domain/briefing.ts";
 import { BriefingGenerationError, type BriefingGenerator } from "../../../modules/research/ports/briefing-generator.ts";
 
-const DEFAULT_GEMINI_MODEL = "gemini-3.8-flash";
+const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
 const GEMINI_TIMEOUT_MS = 25_000;
 
 const briefingSchema = {
@@ -162,6 +162,8 @@ function buildPrompt(input: BriefingGenerationInput): string {
     `faixa_de_funcionarios=${safe(input.lead.employeeCount || "não informada")}`,
     `tipo_de_ancora=${input.identity.anchorType}`,
     `dominio_corporativo=${safe(input.identity.corporateDomain || "não validado")}`,
+    `vinculo_da_pessoa=${input.identity.personStatus}`,
+    `motivo_do_vinculo=${safe(input.identity.personReason || "não informado")}`,
   ].join("; ");
   const sources = input.sources.length
     ? input.sources.map((source) => `<source id="${safeAttribute(source.id)}" url="${safeAttribute(source.url)}"><title>${safe(source.title)}</title><excerpt>${safe(source.excerpt)}</excerpt></source>`).join("\n")
@@ -171,6 +173,7 @@ function buildPrompt(input: BriefingGenerationInput): string {
     `Dados declarados do formulário: <lead>${lead}</lead>.`,
     `Erro de pesquisa: <search_error>${safe(input.searchError || "nenhum")}</search_error>.`,
     `Ambiguidade: <identity_ambiguity>${safe(input.identity.ambiguityReason || "não detectada")}</identity_ambiguity>.`,
+    `Vínculo profissional: <person_identity>${safe(input.identity.personReason || "não há alerta adicional")}</person_identity>.`,
     "<external_untrusted_sources>",
     sources,
     "</external_untrusted_sources>",

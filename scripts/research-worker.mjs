@@ -12,7 +12,12 @@ async function processOne() {
   const job = await researchRuntime.jobQueue.claim(workerId, leaseMs);
   if (!job) return false;
   try {
-    await researchRuntime.runResearch.execute({ leadId: job.leadId, researchRunId: job.researchRunId });
+    const run = await researchRuntime.researchRepository.getRun(job.researchRunId);
+    await researchRuntime.runResearch.execute({
+      leadId: job.leadId,
+      researchRunId: job.researchRunId,
+      allowRecovery: run?.status === "running",
+    });
     await researchRuntime.jobQueue.complete(job.id);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Falha desconhecida no job de pesquisa.";

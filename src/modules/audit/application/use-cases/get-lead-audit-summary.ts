@@ -5,10 +5,12 @@ import type { LeadProfileVersionRepository } from "../../../qualification/ports/
 import type { QualificationRepository } from "../../../qualification/ports/qualification-repository.ts";
 import { toSpicedQualificationDTO } from "../../../qualification/application/spiced-qualification-dto.ts";
 import type { LeadRepository } from "../../../leads/ports/lead-repository.ts";
+import { isLeadId } from "../../../leads/domain/lead.ts";
 import type { ResearchRepository } from "../../../research/ports/research-repository.ts";
 import type { MeetingAttemptRepository } from "../../../scheduling/ports/meeting-attempt-repository.ts";
 import type { AuditRepository } from "../../ports/audit-repository.ts";
 import { sanitizePayload, sanitizeText } from "../../domain/sanitizer.ts";
+import type { ToolExecution } from "../../domain/tool-execution.ts";
 import type { AuditMeetingAttempt, LeadAuditView } from "../audit-dto.ts";
 
 export class GetLeadAuditSummaryUseCase {
@@ -24,12 +26,14 @@ export class GetLeadAuditSummaryUseCase {
   ) {}
 
   async execute(input: { leadId: string; executionId?: string }): Promise<LeadAuditView | null> {
+    if (!isValidAuditQuery(input)) return null;
+    const requestedExecutionId = input.executionId?.trim();
     const lead = await this.leads.get(input.leadId);
     if (!lead) return null;
 
     const allTools = await this.audit.listExecutionsByLeadId(lead.id);
     const executions = buildExecutionOptions(lead.executionId, lead.createdAt, allTools);
-    const selectedExecutionId = input.executionId ?? executions[0]?.id ?? lead.executionId;
+    const selectedExecutionId = requestedExecutionId ?? executions[0]?.id ?? lead.executionId;
     if (!executions.some((execution) => execution.id === selectedExecutionId)) return null;
 
     const [run, briefing, sources, session, artifacts, qualification, profileVersion, meetings, tools] = await Promise.all([
@@ -82,7 +86,7 @@ export class GetLeadAuditSummaryUseCase {
         summary: summaryArtifact?.content ?? null,
       },
       spiced: qualification ? toSpicedQualificationDTO(qualification) : null,
-      tools,
+      tools: tools.map(toSafeToolExecution),
       meeting: {
         status: meetingAttempts.at(-1)?.status ?? "not_requested",
         latest: toAuditMeetingAttempt(meetingAttempts.at(-1)),
@@ -92,6 +96,13 @@ export class GetLeadAuditSummaryUseCase {
   }
 }
 
+export { GetLeadAuditSummaryUseCase as GetLeadAuditSummary };
+
+function isValidAuditQuery(input: { leadId: string; executionId?: string }): boolean {
+  return typeof input.leadId === "string" && isLeadId(input.leadId) &&
+    (input.executionId === undefined || (typeof input.executionId === "string" && input.executionId.trim().length > 0));
+}
+
 function buildExecutionOptions(
   currentExecutionId: string,
   currentCreatedAt: string,
@@ -99,6 +110,7 @@ function buildExecutionOptions(
 ): Array<{ id: string; createdAt: string }> {
   const timestamps = new Map<string, string>([[currentExecutionId, currentCreatedAt]]);
   for (const tool of tools) {
+    if (!tool.executionId.trim()) continue;
     const existing = timestamps.get(tool.executionId);
     if (!existing || tool.createdAt > existing) timestamps.set(tool.executionId, tool.createdAt);
   }
@@ -108,7 +120,18 @@ function buildExecutionOptions(
 }
 
 function latestArtifact<T extends { type: string; occurredAt: string }>(artifacts: T[], type: T["type"]): T | null {
-  return artifacts.filter((artifact) => artifact.type === type).at(-1) ?? null;
+  return artifacts
+    .filter((artifact) => artifact.type === type)
+    .sort((left, right) => left.occurredAt.localeCompare(right.occurredAt))
+    .at(-1) ?? null;
+}
+
+function toSafeToolExecution(tool: ToolExecution): ToolExecution {
+  return {
+    ...tool,
+    input: sanitizePayload(tool.input),
+    output: sanitizePayload(tool.output),
+  };
 }
 
 function isTerminationReason(value: string): value is "completed" | "abandoned" | "failed" {

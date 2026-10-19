@@ -15,6 +15,22 @@ function isAlreadyExists(error: unknown): boolean {
   return typeof error === "object" && error !== null && "code" in error && error.code === "EEXIST";
 }
 
+const briefingLocks = new Map<string, Promise<void>>();
+
+async function withBriefingLock<T>(leadId: string, operation: () => Promise<T>): Promise<T> {
+  const previous = briefingLocks.get(leadId) ?? Promise.resolve();
+  let release!: () => void;
+  const current = new Promise<void>((resolve) => { release = resolve; });
+  briefingLocks.set(leadId, current);
+  await previous;
+  try {
+    return await operation();
+  } finally {
+    release();
+    if (briefingLocks.get(leadId) === current) briefingLocks.delete(leadId);
+  }
+}
+
 export class FileResearchRepository implements ResearchRepository {
   readonly directory: string;
 
@@ -130,15 +146,17 @@ export class FileResearchRepository implements ResearchRepository {
   }
 
   async createBriefing(input: Omit<Briefing, "id" | "version" | "createdAt">): Promise<Briefing> {
-    const previous = await this.getLatestBriefing(input.leadId, input.executionId);
-    const briefing: Briefing = {
-      ...input,
-      id: randomUUID(),
-      version: (previous?.version ?? 0) + 1,
-      createdAt: new Date().toISOString(),
-    };
-    await this.write("briefings", briefing.id, briefing);
-    return briefing;
+    return withBriefingLock(input.leadId, async () => {
+      const previous = await this.getLatestBriefing(input.leadId);
+      const briefing: Briefing = {
+        ...input,
+        id: randomUUID(),
+        version: (previous?.version ?? 0) + 1,
+        createdAt: new Date().toISOString(),
+      };
+      await this.write("briefings", briefing.id, briefing);
+      return briefing;
+    });
   }
 
   async getLatestBriefing(leadId: string, executionId?: string): Promise<Briefing | null> {

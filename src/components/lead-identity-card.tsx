@@ -35,6 +35,14 @@ export function LeadIdentityCard({ identity }: { identity: LeadAuditView["identi
               {identity.corrections.length ? `${identity.corrections.length} alteração(ões)` : "Sem alterações"}
             </Badge>
           </div>
+          <dl className="mb-6 grid gap-3 border-b pb-5">
+            {(Object.keys(fieldLabels) as Array<keyof typeof fieldLabels>).map((field) => (
+              <div key={field} className="grid gap-1 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">
+                <dt className="text-xs text-muted-foreground">{fieldLabels[field]}</dt>
+                <dd className="m-0 break-words whitespace-pre-wrap text-sm">{identity.normalized[field] || "(vazio)"}</dd>
+              </div>
+            ))}
+          </dl>
           {identity.corrections.length ? (
             <ul className="m-0 grid list-none gap-4 p-0">
               {identity.corrections.map((correction) => (

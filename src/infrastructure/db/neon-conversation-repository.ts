@@ -62,7 +62,7 @@ export class NeonConversationRepository implements ConversationRepository, Conve
     const sql = getDatabase();
     await sql`INSERT INTO conversation_artifacts (id, voice_session_id, lead_id, execution_id, external_call_id, artifact_type, content, content_hash, occurred_at, created_at)
       VALUES (${artifact.id}, ${artifact.voiceSessionId}, ${artifact.leadId}, ${artifact.executionId}, ${artifact.externalCallId}, ${artifact.type}, ${artifact.content}, ${artifact.contentHash}, ${artifact.occurredAt}, ${artifact.createdAt})
-      ON CONFLICT (id) DO NOTHING`;
+      ON CONFLICT DO NOTHING`;
   }
 
   async hasHash(voiceSessionId: string, type: ConversationArtifact["type"], contentHash: string): Promise<boolean> {
@@ -82,6 +82,12 @@ export class NeonConversationRepository implements ConversationRepository, Conve
   async getByExternalEventId(externalEventId: string): Promise<WebhookEvent | null> {
     const sql = getDatabase();
     const rows = await sql`SELECT * FROM webhook_events WHERE external_event_id = ${externalEventId} LIMIT 1` as Row[];
+    return rows[0] ? mapWebhookEvent(rows[0]) : null;
+  }
+
+  async getByExternalCallAndType(externalCallId: string, eventType: string): Promise<WebhookEvent | null> {
+    const sql = getDatabase();
+    const rows = await sql`SELECT * FROM webhook_events WHERE external_call_id = ${externalCallId} AND event_type = ${eventType} ORDER BY received_at DESC LIMIT 1` as Row[];
     return rows[0] ? mapWebhookEvent(rows[0]) : null;
   }
 

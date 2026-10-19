@@ -11,7 +11,7 @@ export type TranscriptSegment = {
 export function parseTranscript(rawTranscript: string): TranscriptSegment[] {
   const parsed = parseJson(rawTranscript);
   if (Array.isArray(parsed)) {
-    return parsed.flatMap((segment, index) => toSegment(segment, index));
+    return withInferredEndTimes(parsed.flatMap((segment, index) => toSegment(segment, index)));
   }
   if (typeof rawTranscript === "string" && rawTranscript.trim()) {
     return [{ id: "segment-1", role: "unknown", text: rawTranscript.trim(), startMs: 0, endMs: 0 }];
@@ -44,7 +44,7 @@ function toSegment(value: unknown, index: number): TranscriptSegment[] {
   if (!text) return [];
   const startMs = timeInMilliseconds(item, ["startMs", "start_ms", "start_time", "time_in_call_secs"]);
   const endMs = timeInMilliseconds(item, ["endMs", "end_ms", "end_time"]);
-    const normalizedEndMs = endMs > startMs ? endMs : startMs;
+  const normalizedEndMs = endMs >= startMs ? endMs : startMs;
   return [{
     id: stringValue(item.transcriptSegmentId) ?? stringValue(item.segment_id) ?? stringValue(item.id) ?? `segment-${index + 1}`,
     role: toRole(item.role),
@@ -57,13 +57,29 @@ function toSegment(value: unknown, index: number): TranscriptSegment[] {
 function timeInMilliseconds(item: Record<string, unknown>, fields: string[]): number {
   for (const field of fields) {
     const value = item[field];
-    if (typeof value === "number" && Number.isFinite(value)) return value < 10_000 ? Math.round(value * 1_000) : Math.round(value);
+    const isSeconds = field === "start_time" || field === "end_time" || field === "time_in_call_secs";
+    if (typeof value === "number" && Number.isFinite(value)) return normalizeTimestamp(isSeconds, value);
     if (typeof value === "string" && value.trim() && Number.isFinite(Number(value))) {
       const parsed = Number(value);
-      return parsed < 10_000 ? Math.round(parsed * 1_000) : Math.round(parsed);
+      return normalizeTimestamp(isSeconds, parsed);
     }
   }
   return 0;
+}
+
+function normalizeTimestamp(isSeconds: boolean, value: number): number {
+  return Math.max(0, Math.round(isSeconds ? value * 1_000 : value));
+}
+
+function withInferredEndTimes(segments: TranscriptSegment[]): TranscriptSegment[] {
+  return segments.map((segment, index) => {
+    if (segment.endMs > segment.startMs) return segment;
+    const nextSegment = segments[index + 1];
+    const inferredEndMs = nextSegment && nextSegment.startMs >= segment.startMs
+      ? nextSegment.startMs
+      : segment.startMs;
+    return { ...segment, endMs: inferredEndMs };
+  });
 }
 
 function toRole(value: unknown): TranscriptSegment["role"] {

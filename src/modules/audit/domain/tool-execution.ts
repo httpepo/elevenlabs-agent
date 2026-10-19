@@ -27,27 +27,38 @@ export type ToolExecutionInput = Omit<ToolExecution, "id" | "input" | "output" |
 };
 
 export function createToolExecution(input: ToolExecutionInput): ToolExecution {
-  if (!input.leadId.trim() || !input.executionId.trim()) {
-    throw new Error("Execução de ferramenta sem vínculo de lead ou execução.");
-  }
-  if (!input.provider.trim() || !input.operation.trim()) {
-    throw new Error("Execução de ferramenta sem provedor ou operação.");
+  const leadId = normalizeRequiredValue(input.leadId, "lead ou execução");
+  const executionId = normalizeRequiredValue(input.executionId, "lead ou execução");
+  const provider = normalizeRequiredValue(input.provider, "provedor");
+  const operation = normalizeRequiredValue(input.operation, "operação");
+  if (!toolExecutionStatuses.includes(input.status)) {
+    throw new Error("Status de execução de ferramenta inválido.");
   }
   if (!Number.isFinite(input.durationMs) || input.durationMs < 0) {
     throw new Error("Duração de ferramenta inválida.");
   }
+  const createdAt = input.createdAt ?? new Date().toISOString();
+  if (!Number.isFinite(Date.parse(createdAt))) {
+    throw new Error("Data de execução de ferramenta inválida.");
+  }
   return {
     id: input.id ?? randomUUID(),
-    leadId: input.leadId,
-    executionId: input.executionId,
+    leadId,
+    executionId,
     researchRunId: input.researchRunId ?? null,
     voiceSessionId: input.voiceSessionId ?? null,
-    provider: input.provider,
-    operation: input.operation,
+    provider,
+    operation,
     status: input.status,
     durationMs: Math.round(input.durationMs),
     input: sanitizePayload(input.input),
     output: sanitizePayload(input.output),
-    createdAt: input.createdAt ?? new Date().toISOString(),
+    createdAt,
   };
+}
+
+function normalizeRequiredValue(value: unknown, label: string): string {
+  const normalized = typeof value === "string" ? value.trim() : "";
+  if (!normalized) throw new Error(`Execução de ferramenta sem ${label} válido.`);
+  return normalized;
 }

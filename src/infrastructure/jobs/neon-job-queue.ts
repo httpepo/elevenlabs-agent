@@ -16,16 +16,43 @@ export class NeonJobQueue implements ResearchQueue, JobQueue {
 
   async enqueue(input: EnqueueResearchInput) {
     const sql = getDatabase();
-    await sql.transaction([
-      sql`INSERT INTO research_runs (id, lead_id, execution_id, idempotency_key, status, query_params)
-        VALUES (${randomUUID()}, ${input.leadId}, ${input.executionId}, ${input.idempotencyKey}, 'queued', '{}'::jsonb)
-        ON CONFLICT (idempotency_key) DO NOTHING`,
-      sql`INSERT INTO job_queue (id, type, lead_id, research_run_id, execution_id, idempotency_key, status)
+    const rows = await sql`WITH locked AS (
+        SELECT pg_advisory_xact_lock(hashtextextended(${`research:${input.leadId}:${input.executionId}`}, 0))
+      ), existing_run AS (
+        SELECT research_runs.* FROM research_runs, locked WHERE idempotency_key = ${input.idempotencyKey}
+      ), active_run AS (
+        SELECT research_runs.* FROM research_runs, locked
+        WHERE lead_id = ${input.leadId} AND execution_id = ${input.executionId}
+          AND status IN ('queued', 'running')
+          AND updated_at >= NOW() - INTERVAL '30 seconds'
+        ORDER BY updated_at DESC
+        LIMIT 1
+      ), created_run AS (
+        INSERT INTO research_runs (id, lead_id, execution_id, idempotency_key, status, query_params)
+        SELECT ${randomUUID()}::uuid, ${input.leadId}, ${input.executionId}, ${input.idempotencyKey}, 'queued',
+          ${JSON.stringify(input.queryParams ?? {})}::jsonb
+        FROM locked
+        WHERE NOT EXISTS (SELECT 1 FROM existing_run)
+          AND NOT EXISTS (SELECT 1 FROM active_run)
+        ON CONFLICT (idempotency_key) DO NOTHING
+        RETURNING *
+      ), selected_run AS (
+        SELECT * FROM existing_run
+        UNION ALL
+        SELECT * FROM active_run WHERE NOT EXISTS (SELECT 1 FROM existing_run)
+        UNION ALL
+        SELECT * FROM created_run
+      ), created_job AS (
+        INSERT INTO job_queue (id, type, lead_id, research_run_id, execution_id, idempotency_key, status)
         SELECT ${randomUUID()}::uuid, 'start_research', lead_id, id, execution_id, 'research-job:' || id::text, 'queued'
-        FROM research_runs WHERE idempotency_key = ${input.idempotencyKey}
-        ON CONFLICT (idempotency_key) DO NOTHING`,
-    ]);
-    const run = await this.research.findRunByIdempotencyKey(input.idempotencyKey);
+        FROM selected_run
+        WHERE status IN ('queued', 'running')
+        ON CONFLICT (idempotency_key) DO NOTHING
+        RETURNING id
+      )
+      SELECT selected_run.* FROM selected_run LEFT JOIN created_job ON TRUE` as Row[];
+    if (!rows[0]) throw new Error("Não foi possível recuperar a pesquisa enfileirada.");
+    const run = await this.research.getRun(String(rows[0].id));
     if (!run) throw new Error("Não foi possível recuperar a pesquisa enfileirada.");
     return run;
   }

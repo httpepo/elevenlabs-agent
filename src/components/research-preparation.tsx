@@ -8,15 +8,18 @@ import { Card } from "@/design-system/components/ui/card";
 import type { ResearchStatusView } from "@/modules/research/application/research-dto";
 import { VoiceSessionWidget } from "@/components/voice/voice-session-widget";
 
-export function ResearchPreparation(props: { leadId: string; executionId: string; initialRunId: string | null; visitorName: string }) {
+type ResearchPreparationProps = { leadId: string; executionId: string; initialRunId: string | null; visitorName: string };
+
+export function ResearchPreparation({ initialRunId: _initialRunId, ...props }: ResearchPreparationProps) {
   const [queryClient] = useState(() => new QueryClient());
   return <QueryClientProvider client={queryClient}><PreparationContent {...props} /></QueryClientProvider>;
 }
 
-function PreparationContent({ leadId, executionId, initialRunId, visitorName }: { leadId: string; executionId: string; initialRunId: string | null; visitorName: string }) {
+function PreparationContent({ leadId, executionId, visitorName }: Omit<ResearchPreparationProps, "initialRunId">) {
   const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | null>(null);
   const statusQuery = useQuery<ResearchStatusView>({
-    queryKey: ["lead-research-status", leadId, executionId, initialRunId],
+    queryKey: ["lead-research-status", leadId, executionId],
     queryFn: async (_context: QueryFunctionContext) => {
       const response = await fetch(`/api/leads/${leadId}/status?executionId=${encodeURIComponent(executionId)}`, { cache: "no-store" });
       const payload = await response.json() as ResearchStatusView & { error?: string };
@@ -25,34 +28,41 @@ function PreparationContent({ leadId, executionId, initialRunId, visitorName }: 
     },
     refetchInterval: (query) => {
       const status = query.state.data?.researchStatus;
-      return status === "ready" || status === "partial" || status === "failed" ? false : 1_500;
+      return status === "ready" || status === "partial" || status === "failed" || status === "cancelled" ? false : 1_500;
     },
   });
 
   async function retryResearch() {
     setRetrying(true);
+    setRetryError(null);
     try {
-      await fetch(`/api/leads/${leadId}/research`, { method: "POST" });
+      const response = await fetch(`/api/leads/${leadId}/research`, { method: "POST" });
+      const payload = await response.json().catch(() => null) as { error?: string } | null;
+      if (!response.ok) throw new Error(payload?.error ?? "Não foi possível iniciar uma nova pesquisa.");
       await statusQuery.refetch();
+    } catch (error) {
+      setRetryError(error instanceof Error ? error.message : "Não foi possível iniciar uma nova pesquisa.");
     } finally {
       setRetrying(false);
     }
   }
 
   const status = statusQuery.data;
-  const failed = status?.researchStatus === "failed" || statusQuery.isError;
+  const failed = status?.researchStatus === "failed" || status?.researchStatus === "cancelled" ||
+    (status !== undefined && ["ready", "partial"].includes(status.researchStatus) && !status.isReadyForVoice) || statusQuery.isError;
   const ready = status?.isReadyForVoice === true;
+  const displayedStatus: ResearchStatusView["researchStatus"] = failed ? "failed" : status?.researchStatus ?? "queued";
   return (
     <Card className="record-card preparation-card">
       <div className="mb-6 flex flex-wrap gap-2">
         <Badge variant="secondary">Preparação do atendimento</Badge>
         <Badge variant={failed ? "destructive" : ready ? "default" : "outline"}>
-          {statusLabel(status?.researchStatus ?? "queued")}
+          {statusLabel(displayedStatus)}
         </Badge>
       </div>
       <div aria-live="polite">
         <h2>{failed ? "Não conseguimos preparar seu atendimento." : ready ? "Seu atendimento está pronto." : "Estamos preparando seu atendimento."}</h2>
-        <p>{messageFor(status?.researchStatus ?? "queued", statusQuery.isLoading, statusQuery.isError)}</p>
+        <p>{messageFor(status?.researchStatus ?? "queued", statusQuery.isLoading, statusQuery.isError, failed)}</p>
       </div>
       <div className="preparation-meta" aria-label="Detalhes da preparação">
         <span>Execução: <code>{executionId}</code></span>
@@ -60,7 +70,7 @@ function PreparationContent({ leadId, executionId, initialRunId, visitorName }: 
       </div>
       {failed ? (
         <div className="preparation-action">
-          <p className="field-error" role="alert">{status?.error ?? statusQuery.error?.message ?? "Falha sem diagnóstico disponível."}</p>
+          <p className="field-error" role="alert">{retryError ?? status?.error ?? statusQuery.error?.message ?? "Falha sem diagnóstico disponível."}</p>
           <Button type="button" variant="brand" size="lg" onClick={retryResearch} disabled={retrying}>
             {retrying ? "Tentando novamente…" : "Preparar atendimento novamente"}
           </Button>
@@ -79,8 +89,9 @@ function statusLabel(status: ResearchStatusView["researchStatus"]): string {
   return labels[status];
 }
 
-function messageFor(status: ResearchStatusView["researchStatus"], loading: boolean, error: boolean): string {
+function messageFor(status: ResearchStatusView["researchStatus"], loading: boolean, error: boolean, failed: boolean): string {
   if (error) return "Não foi possível consultar o estado da preparação.";
+  if (failed) return "O briefing desta execução não está disponível. Você pode tentar preparar o atendimento novamente.";
   if (loading) return "Estamos preparando seu atendimento.";
   if (status === "queued") return "Seu atendimento será liberado assim que o contexto estiver pronto.";
   if (status === "running") return "Estamos organizando o contexto para uma conversa mais útil.";

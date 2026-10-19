@@ -51,6 +51,7 @@ export type ResearchSearchResult = {
   url: string;
   title: string;
   excerpt: string;
+  query?: string;
 };
 
 export type BriefingGenerationInput = {
@@ -68,6 +69,8 @@ export type BriefingGenerationInput = {
     corporateDomain: string | null;
     isAmbiguous: boolean;
     ambiguityReason: string | null;
+    personStatus: "corroborated" | "ambiguous" | "unverified";
+    personReason: string | null;
   };
   searchError: string | null;
 };
@@ -87,6 +90,7 @@ export function validateGeneratedBriefing(
 
   for (const fact of briefing.facts) {
     if (!fact.field.trim() || !fact.value.trim()) throw new Error("Gemini retornou fato incompleto.");
+    if (fact.sourceIds.length === 0) throw new Error("Gemini retornou fato sem provenance.");
     if (fact.sourceIds.some((sourceId) => sourceId !== "form_submission" && !sourceIds.has(sourceId))) {
       throw new Error("Gemini referenciou uma fonte inexistente.");
     }

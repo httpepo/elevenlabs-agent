@@ -15,7 +15,7 @@ export class NeonResearchRepository implements ResearchRepository {
     const sql = getDatabase();
     const id = randomUUID();
     await sql`INSERT INTO research_runs (id, lead_id, execution_id, idempotency_key, status, query_params)
-      VALUES (${id}, ${input.leadId}, ${input.executionId}, ${input.idempotencyKey}, 'queued', '{}'::jsonb)
+      VALUES (${id}, ${input.leadId}, ${input.executionId}, ${input.idempotencyKey}, 'queued', ${JSON.stringify(input.queryParams ?? {})}::jsonb)
       ON CONFLICT (idempotency_key) DO NOTHING`;
     const created = await this.findRunByIdempotencyKey(input.idempotencyKey);
     if (!created) throw new Error("Não foi possível criar a execução de pesquisa.");
@@ -88,12 +88,22 @@ export class NeonResearchRepository implements ResearchRepository {
 
   async createBriefing(input: Omit<Briefing, "id" | "version" | "createdAt">): Promise<Briefing> {
     const sql = getDatabase();
-    const rows = await sql`SELECT COALESCE(MAX(version), 0) + 1 AS version FROM briefings WHERE lead_id = ${input.leadId}` as DatabaseRow[];
-    const version = Number(rows[0]?.version ?? 1);
-    const briefing: Briefing = { ...input, id: randomUUID(), version, createdAt: new Date().toISOString() };
-    await sql`INSERT INTO briefings (id, research_run_id, lead_id, execution_id, version, status, summary, facts, hypotheses, gaps, created_at)
-      VALUES (${briefing.id}, ${briefing.researchRunId}, ${briefing.leadId}, ${briefing.executionId}, ${briefing.version}, ${briefing.status}, ${briefing.summary}, ${JSON.stringify(briefing.facts)}::jsonb, ${JSON.stringify(briefing.hypotheses)}::jsonb, ${JSON.stringify(briefing.gaps)}::jsonb, ${briefing.createdAt})`;
-    return briefing;
+    const id = randomUUID();
+    const createdAt = new Date().toISOString();
+    const rows = await sql`WITH locked AS (
+        SELECT pg_advisory_xact_lock(hashtextextended(${`briefing:${input.leadId}`}, 0))
+      ), next_version AS (
+        SELECT COALESCE(MAX(version), 0) + 1 AS version
+        FROM briefings, locked
+        WHERE lead_id = ${input.leadId}
+      )
+      INSERT INTO briefings (id, research_run_id, lead_id, execution_id, version, status, summary, facts, hypotheses, gaps, created_at)
+      SELECT ${id}, ${input.researchRunId}, ${input.leadId}, ${input.executionId}, next_version.version, ${input.status}, ${input.summary},
+        ${JSON.stringify(input.facts)}::jsonb, ${JSON.stringify(input.hypotheses)}::jsonb, ${JSON.stringify(input.gaps)}::jsonb, ${createdAt}
+      FROM next_version
+      RETURNING *` as DatabaseRow[];
+    if (!rows[0]) throw new Error("Não foi possível persistir o briefing.");
+    return mapBriefing(rows[0]);
   }
 
   async getLatestBriefing(leadId: string, executionId?: string): Promise<Briefing | null> {

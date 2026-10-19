@@ -15,8 +15,13 @@ function isMissing(error: unknown): boolean {
   return typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT";
 }
 
+function isAlreadyExists(error: unknown): boolean {
+  return typeof error === "object" && error !== null && "code" in error && error.code === "EEXIST";
+}
+
 export class FileConversationRepository implements ConversationRepository, ConversationArtifactRepository, WebhookEventRepository, VoiceToolExecutionRepository {
   readonly directory: string;
+  private readonly pendingArtifactWrites = new Map<string, Promise<void>>();
 
   constructor(directory = path.join(process.cwd(), ".data", "conversation")) {
     this.directory = directory;
@@ -52,6 +57,23 @@ export class FileConversationRepository implements ConversationRepository, Conve
   }
 
   async appendArtifact(artifact: ConversationArtifact): Promise<void> {
+    const artifactKey = `${artifact.voiceSessionId}:${artifact.type}:${artifact.contentHash}`;
+    const pendingWrite = this.pendingArtifactWrites.get(artifactKey);
+    if (pendingWrite) {
+      await pendingWrite;
+      return;
+    }
+
+    const writeOperation = this.persistArtifact(artifact);
+    this.pendingArtifactWrites.set(artifactKey, writeOperation);
+    try {
+      await writeOperation;
+    } finally {
+      if (this.pendingArtifactWrites.get(artifactKey) === writeOperation) this.pendingArtifactWrites.delete(artifactKey);
+    }
+  }
+
+  private async persistArtifact(artifact: ConversationArtifact): Promise<void> {
     if (await this.hasHash(artifact.voiceSessionId, artifact.type, artifact.contentHash)) return;
     await this.writeIfAbsent("artifacts", artifact.id, artifact);
   }
@@ -73,11 +95,20 @@ export class FileConversationRepository implements ConversationRepository, Conve
     return this.read("webhook-events", eventIndex);
   }
 
+  async getByExternalCallAndType(externalCallId: string, eventType: string): Promise<WebhookEvent | null> {
+    const events = await this.list<WebhookEvent>("webhook-events");
+    return events.find((event) => event.externalCallId === externalCallId && event.eventType === eventType) ?? null;
+  }
+
   async recordReceived(event: WebhookEvent): Promise<WebhookEvent> {
     const key = createHash("sha256").update(event.externalEventId).digest("hex");
     const existing = await this.getByExternalEventId(event.externalEventId);
     if (existing) return existing;
-    await this.writeIfAbsent("webhook-events", key, event);
+    try {
+      await this.writeIfAbsent("webhook-events", key, event);
+    } catch (error) {
+      if (!isAlreadyExists(error)) throw error;
+    }
     return (await this.getByExternalEventId(event.externalEventId)) ?? event;
   }
 

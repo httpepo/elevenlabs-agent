@@ -5,6 +5,7 @@ import { ResearchProviderError, type ResearchProvider, type ResearchProviderInpu
 
 const TAVILY_ENDPOINT = "https://api.tavily.com/search";
 const MAX_RESULTS_PER_QUERY = 5;
+const MAX_TIMEOUT_MS = 6_000;
 
 export class TavilySearchAdapter implements ResearchProvider {
   async search(input: ResearchProviderInput): Promise<ResearchSearchResult[]> {
@@ -12,8 +13,9 @@ export class TavilySearchAdapter implements ResearchProvider {
     const apiKey = environment.TAVILY_API_KEY;
     if (!apiKey) throw new ResearchProviderError("TAVILY_API_KEY não está configurada no servidor.", "configuration");
 
+    const timeoutMs = boundedTimeout(input.timeoutMs);
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), input.timeoutMs);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
       const responses = await Promise.all(input.queries.slice(0, 3).map((query) => this.searchQuery(query, apiKey, controller.signal)));
       return deduplicate(responses.flat());
@@ -59,6 +61,7 @@ export class TavilySearchAdapter implements ResearchProvider {
         url: result.url,
         title: typeof result.title === "string" ? result.title : result.url,
         excerpt: typeof result.content === "string" ? result.content : "",
+        query,
       }];
     });
   }
@@ -87,4 +90,9 @@ function isHttpUrl(value: string): boolean {
 
 function isAbortError(error: unknown): boolean {
   return error instanceof Error && error.name === "AbortError";
+}
+
+function boundedTimeout(value: number): number {
+  if (!Number.isFinite(value) || value <= 0) return MAX_TIMEOUT_MS;
+  return Math.min(Math.floor(value), MAX_TIMEOUT_MS);
 }

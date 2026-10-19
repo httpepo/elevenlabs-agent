@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { createConversationArtifact } from "../domain/conversation-artifact.ts";
-import type { VerifiedCallWebhook, WebhookEvent } from "../domain/call-webhook.ts";
+import { webhookIdempotencyKey, type VerifiedCallWebhook, type WebhookEvent } from "../domain/call-webhook.ts";
 import type { ConversationRepository } from "../ports/conversation-repository.ts";
 import type { ConversationArtifactRepository } from "../ports/conversation-artifact-repository.ts";
 import type { WebhookEventRepository } from "../ports/webhook-event-repository.ts";
@@ -25,9 +25,9 @@ export class ProcessCallWebhookUseCase {
       return { outcome: "rejected" as const, message: "Assinatura do webhook inválida." };
     }
 
-    const existing = await this.webhooks.getByExternalEventId(webhook.eventId);
+    const existing = await this.webhooks.getByExternalCallAndType(webhook.externalCallId, webhook.eventType);
     if (existing?.status === "processed" || existing?.status === "ignored") return { outcome: "duplicate" as const, message: "Evento já processado." };
-    const event = await this.webhooks.recordReceived(toWebhookEvent(webhook));
+    const event = existing ?? await this.webhooks.recordReceived(toWebhookEvent(webhook));
     const session = await this.conversations.findSessionByExternalCallId(webhook.externalCallId);
     if (!session) {
       await this.webhooks.updateStatus({ eventId: event.id, status: "ignored", errorReason: "Conversa externa sem sessão de voz conhecida.", processedAt: new Date().toISOString() });
@@ -45,7 +45,11 @@ export class ProcessCallWebhookUseCase {
         idempotencyKey: `${webhook.externalCallId}:${webhook.eventType}`,
         transcript: webhook.transcript ?? "",
       });
-      await this.completeSession(session.id, webhook.externalCallId);
+      if (qualification.status === "failed") {
+        await this.failSession(session.id, webhook.externalCallId, qualification.error ?? "A extração SPICED falhou.");
+      } else {
+        await this.completeSession(session.id, webhook.externalCallId);
+      }
       const webhookStatus = qualification.status === "failed" ? "failed" as const : "processed" as const;
       await this.webhooks.updateStatus({
         eventId: event.id,
@@ -92,6 +96,17 @@ export class ProcessCallWebhookUseCase {
     }
   }
 
+  private async failSession(sessionId: string, externalCallId: string, reason: string): Promise<void> {
+    const current = await this.conversations.getSession(sessionId);
+    if (!current || ["completed", "abandoned", "failed"].includes(current.status)) return;
+    await this.conversations.transitionSession({
+      sessionId,
+      status: "failed",
+      reason: `Processamento pós-chamada: ${reason}`,
+      externalCallId,
+    });
+  }
+
   private async recordRejected(rawBody: string, error: unknown): Promise<void> {
     const eventId = `rejected:${createHash("sha256").update(rawBody).digest("hex")}`;
     const existing = await this.webhooks.getByExternalEventId(eventId);
@@ -105,7 +120,7 @@ export class ProcessCallWebhookUseCase {
 
 function toWebhookEvent(webhook: VerifiedCallWebhook): WebhookEvent {
   return {
-    id: randomUUID(), externalEventId: webhook.eventId, externalCallId: webhook.externalCallId, eventType: webhook.eventType,
+    id: randomUUID(), externalEventId: webhookIdempotencyKey(webhook), externalCallId: webhook.externalCallId, eventType: webhook.eventType,
     status: "received", payload: webhook.payload, errorReason: null, receivedAt: new Date().toISOString(), processedAt: null,
   };
 }

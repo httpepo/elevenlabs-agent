@@ -85,8 +85,10 @@ export function createSpicedDimension<T extends SpicedDimensionName>(input: {
   const value = input.value?.trim() || null;
   const evidenceRefs = input.evidenceRefs ?? [];
   if (input.status === "known" && !value) throw new Error(`Dimensão ${input.dimension} conhecida sem valor.`);
-  if (input.status === "not_asked" && evidenceRefs.length) throw new Error(`Dimensão ${input.dimension} não perguntada possui evidência.`);
-  if (evidenceRefs.some((ref) => ref.startMs < 0 || ref.endMs < ref.startMs || !ref.excerpt.trim())) {
+  if (input.status === "not_asked" && (value || evidenceRefs.length)) {
+    throw new Error(`Dimensão ${input.dimension} não perguntada possui dados.`);
+  }
+  if (evidenceRefs.some((ref) => !ref.transcriptSegmentId.trim() || !Number.isFinite(ref.startMs) || !Number.isFinite(ref.endMs) || ref.startMs < 0 || ref.endMs < ref.startMs || !ref.excerpt.trim())) {
     throw new Error(`Evidência inválida para dimensão ${input.dimension}.`);
   }
   return {

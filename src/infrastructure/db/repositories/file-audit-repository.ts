@@ -1,5 +1,6 @@
 import "server-only";
 import { mkdir, readFile, readdir, rename, unlink, writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { createToolExecution, type ToolExecution, type ToolExecutionInput } from "../../../modules/audit/domain/tool-execution.ts";
 import type { AuditRepository } from "../../../modules/audit/ports/audit-repository.ts";
@@ -34,17 +35,19 @@ export class FileAuditRepository implements AuditRepository {
   }
 
   async listExecutionsByLeadId(leadId: string, executionId?: string): Promise<ToolExecution[]> {
-    const [generic, research, conversation, qualification] = await Promise.all([
-      this.listDirectory("audit/tool-executions"),
+    const [generic, research, conversation, qualification, scheduling] = await Promise.all([
+      this.listDirectory("tool-executions", this.directory),
       this.listDirectory("research/tool-executions"),
       this.listDirectory("conversation/tool-executions"),
       this.listDirectory("qualification/tool-executions"),
+      this.listDirectory("scheduling/tool-executions"),
     ]);
     const executions = [
       ...generic.map((value) => toGenericExecution(value)),
       ...research.map((value) => toResearchExecution(value as ResearchToolExecution)),
       ...conversation.map((value) => toVoiceExecution(value as VoiceToolExecution)),
       ...qualification.map((value) => toQualificationExecution(value as QualificationToolExecution)),
+      ...scheduling.map((value) => toVoiceExecution(value as CalendarToolExecution)),
     ];
     const unique = new Map(executions.map((execution) => [execution.id, execution]));
     return [...unique.values()]
@@ -52,8 +55,8 @@ export class FileAuditRepository implements AuditRepository {
       .sort((left, right) => left.createdAt.localeCompare(right.createdAt));
   }
 
-  private async listDirectory(relativeDirectory: string): Promise<Record<string, unknown>[]> {
-    const directory = path.join(this.dataDirectory, relativeDirectory);
+  private async listDirectory(relativeDirectory: string, baseDirectory = this.dataDirectory): Promise<Record<string, unknown>[]> {
+    const directory = path.join(baseDirectory, relativeDirectory);
     let names: string[];
     try {
       names = (await readdir(directory)).filter((name) => name.endsWith(".json"));
@@ -163,7 +166,7 @@ function statusValue(value: unknown): ToolExecution["status"] {
 }
 
 function cryptoRandomId(): string {
-  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  return randomUUID();
 }
 
 export const fileAuditRepository = new FileAuditRepository();

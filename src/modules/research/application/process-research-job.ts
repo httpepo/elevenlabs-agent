@@ -22,10 +22,12 @@ export class ProcessResearchJob {
       throw new Error("A pesquisa está reservada por outro executor; entrega deve ser retomada.");
     }
     try {
-      if (run.status === "running") {
-        throw new Error("A execução anterior foi interrompida. Solicite uma nova pesquisa.");
-      }
-      const result = await this.runResearch.execute({ leadId: job.leadId, researchRunId: job.researchRunId });
+      const latestRun = await this.research.getRun(job.researchRunId);
+      const result = await this.runResearch.execute({
+        leadId: job.leadId,
+        researchRunId: job.researchRunId,
+        allowRecovery: latestRun?.status === "running",
+      });
       if (result.status === "failed" || result.status === "cancelled") {
         await this.jobs.fail(job.id, result.errorMessage ?? "Pesquisa encerrada sem briefing disponível.");
         return;

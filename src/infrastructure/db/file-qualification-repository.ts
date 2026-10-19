@@ -1,6 +1,6 @@
 import "server-only";
-import { createHash, randomUUID } from "node:crypto";
-import { mkdir, readFile, readdir, rename, unlink, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { LeadProfileVersion } from "../../modules/qualification/domain/lead-profile-version.ts";
 import type { SpicedQualification } from "../../modules/qualification/domain/spiced-qualification.ts";
@@ -18,6 +18,8 @@ function isAlreadyExists(error: unknown): boolean {
 }
 
 export class FileQualificationRepository implements QualificationRepository, LeadProfileVersionRepository, QualificationToolExecutionRepository {
+  private readonly pendingSaves = new Map<string, Promise<void>>();
+
   constructor(readonly directory = path.join(process.cwd(), ".data", "qualification")) {}
 
   async findByIdempotencyKey(idempotencyKey: string): Promise<SpicedQualification | null> {
@@ -36,6 +38,22 @@ export class FileQualificationRepository implements QualificationRepository, Lea
   }
 
   async save(qualification: SpicedQualification, idempotencyKey: string): Promise<void> {
+    const pendingSave = this.pendingSaves.get(idempotencyKey);
+    if (pendingSave) {
+      await pendingSave;
+      return;
+    }
+
+    const saveOperation = this.persistQualification(qualification, idempotencyKey);
+    this.pendingSaves.set(idempotencyKey, saveOperation);
+    try {
+      await saveOperation;
+    } finally {
+      if (this.pendingSaves.get(idempotencyKey) === saveOperation) this.pendingSaves.delete(idempotencyKey);
+    }
+  }
+
+  private async persistQualification(qualification: SpicedQualification, idempotencyKey: string): Promise<void> {
     const existing = await this.findByIdempotencyKey(idempotencyKey);
     if (existing) return;
     await this.writeIfAbsent("qualifications", qualification.id, qualification);

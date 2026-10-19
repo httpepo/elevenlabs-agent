@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import type { LeadRecord } from "../../leads/domain/lead.ts";
 import type { LeadRepository } from "../../leads/ports/lead-repository.ts";
 import type { ResearchSource, GeneratedBriefing, ResearchGap } from "../domain/briefing.ts";
@@ -11,7 +11,7 @@ import { BriefingGenerationError, type BriefingGenerator } from "../ports/briefi
 import { ResearchProviderError, type ResearchProvider } from "../ports/research-provider.ts";
 import type { ResearchRepository } from "../ports/research-repository.ts";
 
-export type RunResearchInput = { leadId: string; researchRunId: string };
+export type RunResearchInput = { leadId: string; researchRunId: string; allowRecovery?: boolean };
 
 export class RunResearchUseCase {
   private readonly identityResolver = new IdentityResolver();
@@ -41,30 +41,36 @@ export class RunResearchUseCase {
       throw new Error("Execução de pesquisa não pertence ao visitante.");
     }
     if (isTerminalResearchStatus(queuedRun.status)) return queuedRun;
-    if (queuedRun.status === "running") return queuedRun;
+    if (queuedRun.status === "running" && !input.allowRecovery) return queuedRun;
 
     const startedAt = Date.now();
-    const runningRun = await this.research.transitionRun({ runId: queuedRun.id, status: "running" });
+    const runningRun = queuedRun.status === "running"
+      ? queuedRun
+      : await this.research.transitionRun({ runId: queuedRun.id, status: "running" });
     await this.updateLeadProjection(lead, runningRun, []);
     try {
       const identity = this.identityResolver.resolve(lead.normalized);
       const search = await this.searchSources(lead, runningRun, identity);
-      const resolvedIdentity = this.identityResolver.assessCompanyResults(identity, lead.normalized, search.results);
+      const companyIdentity = this.identityResolver.assessCompanyResults(identity, lead.normalized, search.results);
+      const resolvedIdentity = this.identityResolver.assessPersonResults(companyIdentity, lead.normalized, search.results);
       const sources = createSources(lead, runningRun, search.results);
       await this.research.saveSources(sources);
 
       const generated = await this.generateBriefing(lead, runningRun, sources, resolvedIdentity, search.error);
       const safeBriefing = validateGeneratedBriefing(generated, new Set(sources.map((source) => source.id)));
-      const status = resolvedIdentity.isAmbiguous || search.error || sources.length === 0 ? "partial" : "ready";
+      const identitySafeBriefing = removeUnverifiedIdentityClaims(safeBriefing, resolvedIdentity);
+      const status = resolvedIdentity.isAmbiguous || resolvedIdentity.personStatus !== "corroborated" || search.error || sources.length === 0
+        ? "partial"
+        : "ready";
       const briefing = await this.research.createBriefing({
         leadId: lead.id,
         researchRunId: runningRun.id,
         executionId: lead.executionId,
         status,
-        summary: safeBriefing.summary,
-        facts: addFormFacts(safeBriefing.facts, lead),
-        hypotheses: addIdentityHypothesis(safeBriefing.hypotheses, resolvedIdentity),
-        gaps: addDeterministicGaps(safeBriefing.gaps, resolvedIdentity, search.error, sources.length),
+        summary: identitySafeBriefing.summary,
+        facts: addFormFacts(identitySafeBriefing.facts, lead),
+        hypotheses: addIdentityHypothesis(identitySafeBriefing.hypotheses, resolvedIdentity),
+        gaps: addDeterministicGaps(identitySafeBriefing.gaps, resolvedIdentity, sources.length),
       });
       const completedRun = await this.research.transitionRun({
         runId: runningRun.id,
@@ -241,7 +247,7 @@ function createSources(
     }
     if (!unique.has(url)) {
       unique.set(url, {
-        id: randomUUID(),
+        id: stableSourceId(run.id, url),
         leadId: lead.id,
         researchRunId: run.id,
         executionId: lead.executionId,
@@ -269,33 +275,72 @@ function addIdentityHypothesis(
   hypotheses: GeneratedBriefing["hypotheses"],
   identity: IdentityResolution,
 ): GeneratedBriefing["hypotheses"] {
-  if (!identity.isAmbiguous || !identity.ambiguityReason) return hypotheses;
-  return [...hypotheses, {
-    field: "identity",
-    value: "A identidade empresarial permanece ambígua.",
-    confidence: "low",
-    reasoning: `${identity.ambiguityReason} Confirme a organização antes de usar qualquer contexto externo.`,
-  }];
+  const result = [...hypotheses];
+  if (identity.isAmbiguous && identity.ambiguityReason) {
+    result.push({
+      field: "identity",
+      value: "A identidade empresarial permanece ambígua.",
+      confidence: "low",
+      reasoning: `${identity.ambiguityReason} Confirme a organização antes de usar qualquer contexto externo.`,
+    });
+  }
+  if (identity.personStatus === "ambiguous" && identity.personReason) {
+    result.push({
+      field: "person_identity",
+      value: "O vínculo profissional da pessoa permanece ambíguo.",
+      confidence: "low",
+      reasoning: `${identity.personReason} Confirme cargo e vínculo antes de usar contexto pessoal.`,
+    });
+  }
+  return result;
 }
 
 function addDeterministicGaps(
   gaps: GeneratedBriefing["gaps"],
   identity: IdentityResolution,
-  searchError: string | null,
   sourceCount: number,
 ): ResearchGap[] {
   const result = [...gaps];
   const dimensions = new Set(result.map((gap) => gap.dimension));
+  const discoveryGaps: Array<[ResearchGap["dimension"], string]> = [
+    ["pain", "Qual é o principal problema financeiro ou operacional que vocês querem resolver?"],
+    ["impact", "Que impacto esse problema causa hoje em tempo, custo, risco ou visibilidade?"],
+    ["critical_event", "Existe algum prazo, mudança ou evento que torna esta conversa importante agora?"],
+    ["decision", "Quem participa da decisão e como vocês avaliam uma mudança nesse processo?"],
+  ];
+  for (const [dimension, prompt] of discoveryGaps) {
+    if (!dimensions.has(dimension)) result.push({ dimension, prompt });
+  }
   if (identity.isAmbiguous && !dimensions.has("identity")) {
     result.push({ dimension: "identity", prompt: "Confirme o ramo, a localização e a organização representada antes de avançar." });
   }
-  if (searchError && !dimensions.has("person")) {
-    result.push({ dimension: "person", prompt: "Confirme seu cargo e vínculo profissional com a empresa." });
+  if (identity.personStatus !== "corroborated" && !dimensions.has("person")) {
+    result.push({ dimension: "person", prompt: identity.personReason ?? "Confirme seu cargo e vínculo profissional com a empresa." });
   }
   if (sourceCount === 0 && !dimensions.has("situation")) {
     result.push({ dimension: "situation", prompt: "Como vocês organizam hoje a operação financeira e os pagamentos?" });
   }
   return result;
+}
+
+function removeUnverifiedIdentityClaims(
+  briefing: GeneratedBriefing,
+  identity: IdentityResolution,
+): GeneratedBriefing {
+  if (!identity.isAmbiguous && identity.personStatus === "corroborated") return briefing;
+
+  const facts = identity.isAmbiguous
+    ? briefing.facts.filter((fact) => fact.sourceIds.every((sourceId) => sourceId === "form_submission"))
+    : briefing.facts.filter((fact) => !isPersonalIdentityClaim(fact.field));
+  const hypotheses = identity.isAmbiguous
+    ? []
+    : briefing.hypotheses.filter((hypothesis) => !isPersonalIdentityClaim(hypothesis.field));
+
+  return { ...briefing, facts, hypotheses };
+}
+
+function isPersonalIdentityClaim(field: string): boolean {
+  return /(^|_)(person|name|role|title|position|job|profile|linkedin|email|phone)(_|$)/i.test(field);
 }
 
 function cleanText(value: string, maxLength: number): string {
@@ -305,4 +350,13 @@ function cleanText(value: string, maxLength: number): string {
 function safeErrorMessage(error: unknown, fallback: string): string {
   if (!(error instanceof Error)) return fallback;
   return error.message.replace(/[\r\n]+/g, " ").slice(0, 300) || fallback;
+}
+
+function stableSourceId(researchRunId: string, url: string): string {
+  const hexadecimal = createHash("sha256")
+    .update(`${researchRunId}:${url}`)
+    .digest("hex")
+    .slice(0, 32);
+  const variant = ((Number.parseInt(hexadecimal.slice(16, 18), 16) & 0x3f) | 0x80).toString(16).padStart(2, "0");
+  return `${hexadecimal.slice(0, 8)}-${hexadecimal.slice(8, 12)}-4${hexadecimal.slice(13, 16)}-${variant}${hexadecimal.slice(18, 20)}-${hexadecimal.slice(20)}`;
 }

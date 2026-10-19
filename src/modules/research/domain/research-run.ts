@@ -20,6 +20,7 @@ export type EnqueueResearchInput = {
   leadId: string;
   executionId: string;
   idempotencyKey: string;
+  queryParams?: Record<string, unknown>;
 };
 
 const allowedTransitions: Record<ResearchRunStatus, readonly ResearchRunStatus[]> = {
@@ -38,7 +39,7 @@ export function createQueuedResearchRun(input: EnqueueResearchInput, createdAt =
     executionId: input.executionId,
     idempotencyKey: input.idempotencyKey,
     status: "queued",
-    queryParams: {},
+    queryParams: input.queryParams ?? {},
     errorMessage: null,
     executionTimeMs: null,
     updatedAt: createdAt,
