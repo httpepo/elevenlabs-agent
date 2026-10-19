@@ -9,9 +9,22 @@ export type LeadForm = {
   phone: string;
   company: string;
   website: string;
+  employeeCount: string;
 };
 
 export type FieldErrors = Partial<Record<keyof LeadForm, string>>;
+
+export type ResearchStatus = "queued" | "running" | "ready" | "partial" | "failed" | "cancelled";
+
+export type LeadSubmissionRecord = {
+  id: string;
+  leadId: string;
+  executionId: string;
+  idempotencyKey: string;
+  receivedAt: string;
+  original: LeadForm;
+  normalized: LeadForm;
+};
 
 export class ValidationError extends Error {
   readonly fields: FieldErrors;
@@ -34,12 +47,14 @@ type SpicedField = { value: string | null; status: "unknown"; evidence: string[]
 
 export type LeadRecord = {
   id: string;
+  executionId: string;
+  submissionId: string;
   createdAt: string;
   mode: "demo";
   original: LeadForm;
   normalized: LeadForm;
   briefing: { summary: string; gaps: string[] };
-  research: { status: "pending"; sources: { url: string; title: string }[] };
+  research: { status: ResearchStatus; runId: string | null; sources: { url: string; title: string }[] };
   spiced: Record<keyof typeof spicedLabels, SpicedField>;
   conversation: { status: "not_started"; transcript: string | null; summary: string | null };
   meeting: { status: "not_booked"; start: string | null };
@@ -48,7 +63,7 @@ export type LeadRecord = {
     timestamp: string;
     tool: string;
     mode: "demo";
-    status: "completed";
+    status: "completed" | "failed";
     result: string;
   }[];
 };
@@ -62,10 +77,10 @@ export function parseLeadForm(input: unknown): { original: LeadForm; normalized:
   const original = {} as LeadForm;
   const normalized = {} as LeadForm;
   const limits: Record<keyof LeadForm, number> = {
-    fullName: 120, email: 254, phone: 40, company: 160, website: 500,
+    fullName: 120, email: 254, phone: 40, company: 160, website: 500, employeeCount: 50,
   };
   for (const key of Object.keys(limits) as (keyof LeadForm)[]) {
-    const value = record[key] ?? (key === "website" ? "" : undefined);
+    const value = record[key] ?? (key === "website" || key === "employeeCount" ? "" : undefined);
     if (typeof value !== "string") {
       fields[key] = "Informe um texto válido.";
       original[key] = "";
@@ -75,28 +90,46 @@ export function parseLeadForm(input: unknown): { original: LeadForm; normalized:
     original[key] = value;
     normalized[key] = value.trim();
     if (value.length > limits[key]) fields[key] = "O texto ultrapassa o limite deste campo.";
-    if (key !== "website" && !normalized[key]) fields[key] = "Preencha este campo.";
+    if (key !== "website" && key !== "employeeCount" && !normalized[key]) fields[key] = "Preencha este campo.";
   }
   if (normalized.fullName.length < 2) fields.fullName = "Informe seu nome.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized.email)) fields.email = "Informe um e-mail válido.";
+  if (!isValidEmail(normalized.email)) fields.email = "Informe um e-mail válido.";
   const digits = normalized.phone.replace(/\D/g, "");
-  if (!/^[+\d\s().-]+$/.test(normalized.phone) || digits.length < 10 || digits.length > 15) {
+  if (!/^\+?[0-9\s().-]+$/.test(normalized.phone) || digits.length < 10 || digits.length > 15) {
     fields.phone = "Informe o telefone com DDD.";
   }
   if (normalized.website) {
     try {
       const url = new URL(normalized.website);
-      if (!["http:", "https:"].includes(url.protocol) || url.username || url.password || !url.hostname.includes(".")) {
+      if (!["http:", "https:"].includes(url.protocol) || url.username || url.password || !url.hostname) {
         fields.website = "Use um endereço completo, como https://empresa.com.br.";
       }
     } catch {
       fields.website = "Use um endereço completo, como https://empresa.com.br.";
     }
   }
+  if (normalized.employeeCount && !/^\d{1,7}(?:\s*(?:[-–—]|a)\s*\d{1,7}|\s*\+)?$/.test(normalized.employeeCount)) {
+    fields.employeeCount = "Informe um número ou faixa de funcionários válida.";
+  }
   if (Object.keys(fields).length) throw new ValidationError(fields);
   normalized.email = normalized.email.toLowerCase();
   normalized.phone = digits;
   return { original, normalized };
+}
+
+function isValidEmail(email: string): boolean {
+  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return false;
+  const [localPart, domain] = email.split("@");
+  return Boolean(
+    localPart && domain &&
+    localPart.length <= 64 &&
+    !localPart.startsWith(".") &&
+    !localPart.endsWith(".") &&
+    !localPart.includes("..") &&
+    !domain.startsWith(".") &&
+    !domain.endsWith(".") &&
+    !domain.includes(".."),
+  );
 }
 
 export function createDemoLead(input: unknown): LeadRecord {
@@ -111,7 +144,13 @@ export function createDemoLead(input: unknown): LeadRecord {
     decision: unknownField(),
   };
   return {
-    id: randomUUID(), createdAt, mode: "demo", original, normalized,
+    id: randomUUID(),
+    executionId: randomUUID(),
+    submissionId: randomUUID(),
+    createdAt,
+    mode: "demo",
+    original,
+    normalized,
     briefing: {
       summary: `${normalized.fullName} preencheu o cadastro e informou ${normalized.company} como empresa. Este briefing inicial usa apenas o formulário. O vínculo profissional, os dados da empresa e suas necessidades ainda precisam ser pesquisados ou confirmados.`,
       gaps: [
@@ -120,15 +159,63 @@ export function createDemoLead(input: unknown): LeadRecord {
         "Descobrir dor, impacto, evento crítico e processo de decisão.",
       ],
     },
-    research: { status: "pending", sources: [] },
+    research: { status: "queued", runId: null, sources: [] },
     spiced,
     conversation: { status: "not_started", transcript: null, summary: null },
     meeting: { status: "not_booked", start: null },
     trace: [{
-      id: randomUUID(), timestamp: createdAt, tool: "prepare_initial_briefing",
+      id: randomUUID(), timestamp: createdAt, tool: "lead_captured",
       mode: "demo", status: "completed",
-      result: "Briefing inicial preparado a partir do formulário. Nenhuma pesquisa externa, chamada de IA ou reserva de agenda foi executada.",
+      result: "Cadastro recebido. O formulário original foi preservado; nenhuma pesquisa externa foi executada nesta etapa.",
     }],
+  };
+}
+
+export function createLeadSubmission(lead: LeadRecord, idempotencyKey: string): LeadSubmissionRecord {
+  return {
+    id: lead.submissionId,
+    leadId: lead.id,
+    executionId: lead.executionId,
+    idempotencyKey,
+    receivedAt: lead.createdAt,
+    original: lead.original,
+    normalized: lead.normalized,
+  };
+}
+
+export function linkResearchRun(lead: LeadRecord, researchRunId: string, timestamp = new Date().toISOString()): LeadRecord {
+  return {
+    ...lead,
+    research: { ...lead.research, status: "queued", runId: researchRunId },
+    trace: [
+      ...lead.trace,
+      {
+        id: randomUUID(),
+        timestamp,
+        tool: "enqueue_research",
+        mode: lead.mode,
+        status: "completed",
+        result: "Execução de pesquisa enfileirada com estado queued. Nenhuma fonte externa foi consultada nesta etapa.",
+      },
+    ],
+  };
+}
+
+export function markResearchEnqueueFailed(lead: LeadRecord, timestamp = new Date().toISOString()): LeadRecord {
+  return {
+    ...lead,
+    research: { ...lead.research, status: "failed", runId: null },
+    trace: [
+      ...lead.trace,
+      {
+        id: randomUUID(),
+        timestamp,
+        tool: "enqueue_research",
+        mode: lead.mode,
+        status: "failed",
+        result: "Cadastro salvo, mas a execução de pesquisa não pôde ser enfileirada.",
+      },
+    ],
   };
 }
 

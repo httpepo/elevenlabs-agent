@@ -1,11 +1,13 @@
 import { createDemoLead } from "../domain/lead.ts";
 import type { LeadRepository } from "../ports/lead-repository.ts";
-import type { CreateLeadResponse, LeadDetails } from "./lead-dto.ts";
+import type { LeadDetails } from "./lead-dto.ts";
+
+type DemoCreateLeadResponse = { id: string; mode: "demo" };
 
 /** Organiza apenas o fluxo já existente; não dispara pesquisa, voz ou agenda. */
 export function createDemoLeadUseCases(repository: LeadRepository) {
   return {
-    async create(input: unknown): Promise<CreateLeadResponse> {
+    async create(input: unknown): Promise<DemoCreateLeadResponse> {
       const lead = createDemoLead(input);
       await repository.save(lead);
       return { id: lead.id, mode: lead.mode };
