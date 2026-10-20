@@ -5,7 +5,7 @@ Antes de qualquer resposta, plano ou alteração, leia integralmente o
 Codex, Claude, Cursor, Gemini e demais agentes.
 
 Aplique as regras do `AGENTS.md` desde o início de cada prompt. Em especial:
-- **Design System**: use apenas o design system incorporado em `src/design-system`, reutilize `@/design-system/components/ui/*`, altere tokens somente em `src/design-system/tokens.json`, não extraia o design system para pacote externo.
+- **Design System**: use apenas o design system incorporado em `src/design-system`, reutilize `@/design-system/components/ui/*`, altere tokens somente em `src/design-system/tokens.json`, sem criar pacote ou workspace externo.
 - **Arquitetura modular**: rotas em `src/app`, casos de uso em `src/modules`, infraestrutura e provedores em `src/infrastructure`, e composições em `src/components`.
 - **Clean Code obrigatório**: nomes significativos, funções pequenas e focadas (SRP), código autoexplicativo (sem comentários desnecessários), Regra do Escoteiro (Boy Scout Rule), DRY e tratamento limpo de erros com try/catch isolados.
 - **Diretriz sobre testes**: NÃO perca tempo criando novos testes nem executando testes (`pnpm test`). Concentre o esforço na funcionalidade real, validação de tipos (`pnpm typecheck`) e compilação (`pnpm build`).

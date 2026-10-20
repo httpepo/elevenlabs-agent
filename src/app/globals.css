@@ -16,10 +16,9 @@
 @layer components {
   .site-header, main { @apply mx-auto w-full max-w-6xl px-5 sm:px-7; }
   .site-header { @apply flex min-h-20 flex-wrap items-center gap-4 border-b border-border py-5 sm:gap-6; }
-  .brand { @apply inline-flex w-28 shrink-0 items-center rounded-sm sm:w-36; }
+  .brand { @apply inline-flex w-26 shrink-0 items-center rounded-sm sm:w-30; }
   .brand img { @apply block h-auto w-full; }
   .site-header nav { @apply ml-auto flex items-center gap-1; }
-  .case-badge { @apply hidden sm:inline-flex; }
   .home-grid { @apply grid grid-cols-1 gap-10 py-10 lg:grid-cols-2 lg:gap-20 lg:py-16; }
   .eyebrow { @apply mb-4 block text-xs font-medium text-primary; }
   .lede { @apply text-lg leading-relaxed text-muted-foreground; }
@@ -72,38 +71,29 @@
   .trace { @apply border-t pt-5; font-family: var(--atlas-font-inter); }
   .trace > div { @apply mb-3 flex flex-wrap items-center gap-3; }
   .trace small { @apply text-xs text-muted-foreground; }
-  .site-footer { @apply relative isolate overflow-hidden bg-background px-6 pb-10 text-foreground md:px-20 md:pb-16; }
-  .footer-container { @apply relative z-10 mx-auto w-full max-w-6xl px-6 md:px-0; }
+  .site-footer { @apply relative isolate overflow-hidden border-t border-border bg-background px-6 pb-10 text-foreground md:px-20 md:pb-14; }
+  .footer-container { @apply relative z-10 mx-auto w-full max-w-6xl px-1 md:px-0; }
   .footer-glow {
-    @apply pointer-events-none absolute inset-x-0 top-0 h-90 md:h-140;
-    background: radial-gradient(55% 100% at 50% -6%, hsl(var(--footer-glow) / 0.35) 0%, hsl(var(--footer-glow) / 0.12) 40%, transparent 72%);
+    @apply pointer-events-none absolute inset-x-0 top-0 h-72 md:h-96;
+    background: radial-gradient(55% 100% at 50% -6%, hsl(var(--footer-glow) / 0.3) 0%, hsl(var(--footer-glow) / 0.1) 40%, transparent 72%);
   }
   .footer-glow::before {
     @apply absolute inset-0 blur-lg content-[''];
-    background: conic-gradient(from 100deg at 50% -25%, transparent 0deg, hsl(var(--footer-glow) / 0.18) 15deg, transparent 24deg, hsl(var(--footer-glow) / 0.15) 40deg, transparent 51deg, hsl(var(--footer-glow) / 0.2) 65deg, transparent 82deg, hsl(var(--footer-glow) / 0.15) 100deg, transparent 120deg, hsl(var(--footer-glow) / 0.18) 143deg, transparent 160deg);
+    background: conic-gradient(from 100deg at 50% -25%, transparent 0deg, hsl(var(--footer-glow) / 0.16) 15deg, transparent 24deg, hsl(var(--footer-glow) / 0.12) 40deg, transparent 51deg, hsl(var(--footer-glow) / 0.18) 65deg, transparent 82deg, hsl(var(--footer-glow) / 0.12) 100deg, transparent 120deg, hsl(var(--footer-glow) / 0.16) 143deg, transparent 160deg);
     mask-image: linear-gradient(to bottom, black, transparent);
   }
-.footer-navigation { @apply grid grid-cols-2 gap-12 pt-20 md:pt-32 lg:grid-cols-[1.2fr_repeat(4,minmax(0,1fr))]; }
-  .footer-brand-column { @apply col-span-2 mb-4 flex min-w-0 flex-col gap-6 lg:col-span-1 lg:mb-0; }
-  .footer-brand { @apply inline-flex w-48 max-w-full rounded-sm; }
+  .footer-navigation { @apply grid grid-cols-1 gap-10 pt-14 md:grid-cols-[1.6fr_repeat(2,minmax(0,1fr))] md:pt-18; }
+  .footer-brand-column { @apply flex min-w-0 max-w-md flex-col gap-4; }
+  .footer-brand { @apply inline-flex w-28 max-w-full rounded-sm; }
   .footer-brand img { @apply block h-auto w-full; }
+  .footer-summary { @apply m-0 text-sm leading-relaxed text-muted-foreground; }
   .footer-copyright { @apply text-sm leading-tight text-muted-foreground; }
-  .footer-column { @apply flex min-w-0 flex-col gap-5; }
-  .footer-column h3 { @apply m-0 text-lg leading-tight font-semibold; }
+  .footer-column { @apply flex min-w-0 flex-col gap-3; }
+  .footer-column h3 { @apply m-0 text-sm leading-tight font-semibold; }
   .footer-links { @apply m-0 flex list-none flex-col gap-0.5 p-0; }
-  .footer-links a { @apply inline-block py-2.5 text-base leading-tight break-words text-muted-foreground transition-colors hover:text-foreground; }
-  .footer-legal { @apply mt-12 lg:mt-20; }
-  .footer-legal-bar { @apply flex flex-col gap-4 border-t border-border pt-8 lg:flex-row lg:items-center lg:justify-between; }
-  .footer-legal-navigation { @apply flex flex-wrap items-center gap-x-5 gap-y-3; }
-  .footer-policy-links { @apply m-0 flex list-none flex-wrap items-center gap-x-5 gap-y-3 p-0; }
-  .footer-policy-links li { @apply border-l border-border pl-5; }
-  .footer-policy-links a { @apply inline-block py-1 text-sm leading-tight text-muted-foreground transition-colors hover:text-foreground; }
-  .footer-social-link { @apply inline-flex size-6 shrink-0 items-center justify-center rounded-sm; }
-  .footer-social-icon { @apply size-5; }
-  .footer-social-background { fill: var(--atlas-color-brand-linkedin); }
-  .footer-social-mark { @apply fill-primary-foreground; }
-  .footer-company-details { @apply mt-4 grid gap-2 text-xs leading-relaxed text-muted-foreground; }
-  .footer-company-details p { @apply m-0; }
+  .footer-links a { @apply inline-block py-1.5 text-sm leading-tight break-words text-muted-foreground transition-colors hover:text-foreground; }
+  .footer-legal { @apply mt-10; }
+  .footer-legal-bar { @apply flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between; }
   .preparation-card { @apply border-primary/40; }
   .preparation-status { @apply my-7 flex items-center gap-5 rounded-xl border border-primary/30 bg-background p-5; }
   .preparation-indicator { @apply relative flex size-16 shrink-0 items-center justify-center rounded-full border border-primary/30; }

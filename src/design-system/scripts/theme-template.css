@@ -50,7 +50,7 @@
   font-display: swap;
 }
 
-/* Original public values, namespaced to avoid overriding component-library roles. */
+/* Base theme values, namespaced to avoid overriding component-library roles. */
 :root {
   __ATLAS_SOURCE_PROPERTIES__
   --atlas-font-dm-sans: "DM Sans", sans-serif;

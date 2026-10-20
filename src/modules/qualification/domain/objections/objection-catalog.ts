@@ -56,7 +56,7 @@ export const objectionCatalog: readonly ObjectionDefinition[] = [
     ],
     response: "A Atlas trabalha com integração ao ERP e conexão de contas bancárias via Open Finance. Um especialista pode confirmar a compatibilidade e o desenho adequado para sua operação.",
     nextStep: "Identifique o sistema utilizado e o que ainda exige trabalho manual.",
-    limits: "Não confirme compatibilidade com um fornecedor específico nem prometa que trocar o sistema atual será necessário ou desnecessário; encaminhe a avaliação ao especialista.",
+    limits: "Não confirme compatibilidade com um fornecedor específico nem prometa que trocar o sistema atual será necessário ou desnecessário; encaminhe a análise ao especialista.",
     source: "policy/commercial-capabilities",
     sourceVersion: "2026",
   },
@@ -69,7 +69,7 @@ export const objectionCatalog: readonly ObjectionDefinition[] = [
     nextStep: "Registre quem participa da decisão e convide essas pessoas, sem pressionar.",
     limits: "Não desqualifique automaticamente pelo cargo nem invente critérios de exclusão.",
     source: "policy/icp-guidelines",
-    sourceVersion: "2026-10-18",
+    sourceVersion: "2026-10",
   },
   {
     category: "timing_no_time",
@@ -80,7 +80,7 @@ export const objectionCatalog: readonly ObjectionDefinition[] = [
     nextStep: "Respeite o encerramento ou consulte a agenda somente após aceite explícito.",
     limits: "Não pressione nem prometa contato automático futuro que a aplicação não executa.",
     source: "policy/attendance-conduct",
-    sourceVersion: "2026-10-16",
+    sourceVersion: "2026-10",
   },
   {
     category: "implementation_anxiety",
@@ -120,7 +120,7 @@ export const objectionCatalog: readonly ObjectionDefinition[] = [
     nextStep: "Acolha o pedido e consulte a agenda somente após aceite explícito.",
     limits: "Não finja ser humano. Se perguntarem se você é um robô, explique que é o Anderson, agente de voz da Atlas. Não prometa transferência imediata para outro canal.",
     source: "policy/attendance-conduct",
-    sourceVersion: "2026-10-16",
+    sourceVersion: "2026-10",
   },
   {
     category: "non_construction_sector",

@@ -22,7 +22,7 @@ const buttonVariants = cva(
           "border bg-secondary text-secondary-foreground border border-secondary-border ",
         ghost: "border border-transparent",
         link: "text-primary underline-offset-4 hover:underline",
-        // Atlas marketing CTA: original --gradient-atlas-brand with its declared hover.
+        // Brand CTA gradient with its declared hover state.
         brand:
           "border border-transparent text-primary-foreground bg-[image:var(--atlas-gradient-atlas-brand)] hover:bg-[image:var(--atlas-gradient-atlas-brand-hover)] rounded-[var(--atlas-radius-button)]",
       },
