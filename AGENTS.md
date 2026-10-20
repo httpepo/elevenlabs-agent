@@ -49,8 +49,8 @@ atendimento e qualificação comercial por voz:
    briefing, transcrição, resumo, SPICED, objeções, fontes, ferramentas e
    histórico da agenda.
 
-Mocks identificados servem apenas ao desenvolvimento local; preserve a separação
-entre fatos públicos, declarações do visitante e hipóteses.
+Mocks identificados servem apenas ao desenvolvimento local; documentos locais de
+apoio permanecem fora do controle de versão.
 
 ## Arquitetura obrigatória
 

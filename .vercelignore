@@ -9,6 +9,7 @@ service-account*.json
 *.pem
 *.key
 docs/
+documentation/
 tests/
 openspec/
 skills/

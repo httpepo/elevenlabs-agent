@@ -33,6 +33,8 @@ node_modules/
 
 # Documentos locais e materiais de referência
 /docs/
+/documentation/
+/openspec/changes/**/system-documentation/
 
 # Dados dos visitantes e arquivos temporários de execução
 /.data/
