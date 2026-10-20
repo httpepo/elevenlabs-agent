@@ -2,7 +2,6 @@ import { randomUUID } from "node:crypto";
 import {
   calendarOfferLifetimeMilliseconds,
   calendarTimezone,
-  getCalendarLocalParts,
   validateAvailabilityQuery,
   type AvailabilityQuery,
   type CalendarSlot,
@@ -70,7 +69,7 @@ export class GetAvailabilityUseCase {
           status: "no_slots",
           timezone: calendarTimezone,
           options: [],
-          message: "Não encontrei horários livres nesta janela. Posso consultar outro período.",
+          message: "Não encontrei horários livres nesta janela. Posso apresentar outro período.",
         };
         telemetryStatus = "success";
         telemetryOutput = { status: result.status, optionCount: 0 };
@@ -90,7 +89,7 @@ export class GetAvailabilityUseCase {
         status: "offered",
         timezone: calendarTimezone,
         options,
-        message: "Encontrei algumas opções. Escolha uma delas e confirme que deseja reservar.",
+        message: "Estas são as opções disponíveis. Escolha uma delas e confirme que deseja reservar.",
       };
       telemetryStatus = "success";
       telemetryOutput = { status: result.status, optionCount: options.length, timezone: result.timezone };
@@ -158,22 +157,7 @@ export class GetAvailabilityUseCase {
 }
 
 export function selectFriendlySlots(slots: CalendarSlot[]): CalendarSlot[] {
-  const ordered = [...slots].sort((left, right) => Date.parse(left.start) - Date.parse(right.start));
-  if (ordered.length <= 3) return ordered;
-  const selected: CalendarSlot[] = [ordered[0]];
-  const firstPeriod = periodOf(ordered[0]);
-  const balanced = ordered.find((slot) => periodOf(slot) !== firstPeriod);
-  if (balanced && balanced !== ordered[0]) selected.push(balanced);
-  for (const slot of ordered) {
-    if (selected.length >= 3) break;
-    if (!selected.includes(slot)) selected.push(slot);
-  }
-  return selected.sort((left, right) => Date.parse(left.start) - Date.parse(right.start));
-}
-
-function periodOf(slot: CalendarSlot): "morning" | "afternoon" {
-  const local = getCalendarLocalParts(Date.parse(slot.start));
-  return local.minutes < 12 * 60 ? "morning" : "afternoon";
+  return [...slots].sort((left, right) => Date.parse(left.start) - Date.parse(right.start));
 }
 
 function formatSpokenLabel(start: string): string {
