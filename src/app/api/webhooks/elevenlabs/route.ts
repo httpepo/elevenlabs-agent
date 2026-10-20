@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     const rawBody = await request.text();
-    if (Buffer.byteLength(rawBody, "utf8") > 256_000) return Response.json({ error: "Webhook muito grande." }, { status: 413 });
+    if (Buffer.byteLength(rawBody, "utf8") > 4_000_000) return Response.json({ error: "Webhook muito grande; os dados serão recuperados pela API de voz." }, { status: 413 });
     const result = await conversationRuntime.processCallWebhook.execute({
       rawBody,
       signature: request.headers.get("ElevenLabs-Signature"),

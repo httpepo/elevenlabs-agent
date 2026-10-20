@@ -4,7 +4,7 @@ import { getServerEnvironment } from "../config/env.ts";
 import { WebhookVerificationError, type CallWebhookVerifier } from "../../modules/conversation/ports/call-webhook-verifier.ts";
 import type { VerifiedCallWebhook } from "../../modules/conversation/domain/call-webhook.ts";
 
-const MAX_BODY_BYTES = 256 * 1024;
+const MAX_BODY_BYTES = 4_000_000;
 const MAX_CLOCK_SKEW_SECONDS = 30 * 60;
 
 export class ElevenLabsWebhookVerifier implements CallWebhookVerifier {
@@ -58,13 +58,13 @@ function parsePayload(rawBody: string): Record<string, unknown> {
 }
 
 function serializeTranscript(value: unknown): string | null {
-  return Array.isArray(value) && value.length ? JSON.stringify(value).slice(0, 200_000) : null;
+  return Array.isArray(value) && value.length ? JSON.stringify(value) : null;
 }
 
 function extractSummary(value: unknown): string | null {
   const analysis = asRecord(value);
   const summary = stringValue(analysis.transcript_summary) || stringValue(analysis.summary);
-  return summary?.slice(0, 20_000) || null;
+  return summary || null;
 }
 
 function timestampToIso(value: unknown): string {
