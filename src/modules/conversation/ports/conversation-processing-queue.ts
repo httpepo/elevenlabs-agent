@@ -1,9 +1,5 @@
 export type ConversationProcessingJob = {
-  externalCallId: string;
-  eventType: string;
-  transcript: string;
-  summary: string | null;
-  occurredAt: string;
+  voiceSessionId: string;
 };
 
 export interface ConversationProcessingQueue {

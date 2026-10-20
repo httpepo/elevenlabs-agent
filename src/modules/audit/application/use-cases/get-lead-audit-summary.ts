@@ -12,6 +12,8 @@ import type { AuditRepository } from "../../ports/audit-repository.ts";
 import { sanitizePayload, sanitizeText } from "../../domain/sanitizer.ts";
 import type { ToolExecution } from "../../domain/tool-execution.ts";
 import type { AuditMeetingAttempt, LeadAuditView } from "../audit-dto.ts";
+import type { ConversationProcessingRepository } from "../../../conversation/ports/conversation-processing-repository.ts";
+import { conversationProcessingView } from "../../../conversation/application/conversation-processing-view.ts";
 
 export class GetLeadAuditSummaryUseCase {
   constructor(
@@ -23,6 +25,7 @@ export class GetLeadAuditSummaryUseCase {
     private readonly profileVersions: LeadProfileVersionRepository,
     private readonly meetings: MeetingAttemptRepository,
     private readonly audit: AuditRepository,
+    private readonly processingJobs: ConversationProcessingRepository,
   ) {}
 
   async execute(input: { leadId: string; executionId?: string }): Promise<LeadAuditView | null> {
@@ -53,6 +56,7 @@ export class GetLeadAuditSummaryUseCase {
     const summaryArtifact = latestArtifact(sessionArtifacts, "summary");
     const conversationStatus = session?.status ?? "not_started";
     const meetingAttempts = meetings;
+    const processingJob = session ? await this.processingJobs.get(session.id) : null;
 
     return {
       lead: {
@@ -80,7 +84,8 @@ export class GetLeadAuditSummaryUseCase {
       conversation: {
         sessionId: session?.id ?? null,
         status: conversationStatus,
-        processing: conversationStatus === "finalizing",
+        ...conversationProcessingView(session, processingJob, Boolean(transcriptArtifact), Boolean(session && qualification?.voiceSessionId === session.id)),
+        failureReason: session?.failureReason ?? null,
         durationMs: session?.durationMs ?? null,
         terminationReason: isTerminationReason(conversationStatus) ? conversationStatus : null,
         transcript: transcriptArtifact ? parseTranscript(transcriptArtifact.content) : [],

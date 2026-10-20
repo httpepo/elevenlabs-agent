@@ -40,6 +40,11 @@ import { HmacVoiceToolCredentialService } from "./security/voice-tool-credential
 import { ProcessResearchJob } from "../modules/research/application/process-research-job.ts";
 import { VercelResearchQueue, createResearchConsumer } from "./jobs/vercel-research-queue.ts";
 import { VercelConversationProcessingQueue, createConversationConsumer } from "./jobs/vercel-conversation-queue.ts";
+import { NeonConversationProcessingRepository } from "./db/neon-conversation-processing-repository.ts";
+import { FileConversationProcessingRepository } from "./db/file-conversation-processing-repository.ts";
+import { ElevenLabsConversationResultProvider } from "./providers/elevenlabs/elevenlabs-conversation-result.ts";
+import { ScheduleConversationProcessingUseCase } from "../modules/conversation/application/schedule-conversation-processing.ts";
+import { ProcessConversationJobUseCase } from "../modules/conversation/application/process-conversation-job.ts";
 
 export { issueLeadSessionCookie, readLeadSessionCredential } from "./security/lead-session.ts";
 
@@ -81,10 +86,14 @@ const extractSpicedQualification = new ExtractSpicedQualificationUseCase(
 const leadSessionCredentialVerifier = new EnvironmentLeadSessionCredentialVerifier();
 const voiceProvider = new ElevenLabsVoiceProvider();
 const webhookVerifier = new ElevenLabsWebhookVerifier();
+const conversationProcessingRepository = useNeonPersistence ? new NeonConversationProcessingRepository() : new FileConversationProcessingRepository();
 const conversationProcessingQueue = process.env.VERCEL === "1" && useNeonPersistence
   ? new VercelConversationProcessingQueue()
-  : undefined;
-const processCallWebhook = new ProcessCallWebhookUseCase(webhookVerifier, conversationRepository, conversationRepository, conversationRepository, extractSpicedQualification, conversationProcessingQueue);
+  : { enqueue: async ({ voiceSessionId }: { voiceSessionId: string }) => { await conversationProcessingRepository.ensure(voiceSessionId); } };
+const scheduleConversationProcessing = new ScheduleConversationProcessingUseCase(conversationRepository, conversationProcessingRepository, conversationProcessingQueue);
+const processConversationJob = new ProcessConversationJobUseCase(conversationProcessingRepository, conversationRepository,
+  conversationRepository, new ElevenLabsConversationResultProvider(), extractSpicedQualification, conversationRepository, conversationRepository);
+const processCallWebhook = new ProcessCallWebhookUseCase(webhookVerifier, conversationRepository, conversationRepository, conversationRepository, scheduleConversationProcessing);
 
 export const conversationRuntime = {
   conversationRepository,
@@ -97,10 +106,19 @@ export const conversationRuntime = {
     conversationRepository,
     voiceToolCredentials,
   ),
-  processBrowserEvent: new ProcessVoiceSessionEventUseCase(leadStore, conversationRepository, leadSessionCredentialVerifier),
-  getVoiceSessionStatus: new GetVoiceSessionStatusUseCase(leadStore, conversationRepository, leadSessionCredentialVerifier),
+  processBrowserEvent: new ProcessVoiceSessionEventUseCase(leadStore, conversationRepository, leadSessionCredentialVerifier, scheduleConversationProcessing),
+  getVoiceSessionStatus: new GetVoiceSessionStatusUseCase(leadStore, conversationRepository, leadSessionCredentialVerifier, conversationProcessingRepository),
   processCallWebhook,
-  consumeProcessingMessage: createConversationConsumer((job) => processCallWebhook.executeQueued(job)),
+  conversationProcessingRepository,
+  scheduleConversationProcessing,
+  processConversationJob,
+  recoverConversation: async (voiceSessionId: string) => {
+    try { await scheduleConversationProcessing.execute(voiceSessionId); }
+    catch (error) { console.warn("conversation_queue_delivery_pending", { voiceSessionId, error: error instanceof Error ? error.name : "UnknownError" }); }
+    try { await processConversationJob.execute(voiceSessionId); }
+    catch (error) { console.warn("conversation_processing_retry", { voiceSessionId, error: error instanceof Error ? error.message : "UnknownError" }); }
+  },
+  consumeProcessingMessage: createConversationConsumer((job) => processConversationJob.execute(job.voiceSessionId, true)),
 };
 
 export const qualificationRuntime = {
@@ -148,6 +166,7 @@ export const auditRuntime = {
     qualificationRepository,
     meetingAttemptRepository,
     auditRepository,
+    conversationProcessingRepository,
   ),
   listAttendanceOverview: new ListAttendanceOverviewUseCase(
     leadStore,
@@ -155,6 +174,7 @@ export const auditRuntime = {
     conversationRepository,
     qualificationRepository,
     meetingAttemptRepository,
+    conversationProcessingRepository,
   ),
 };
 

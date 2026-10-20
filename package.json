@@ -25,6 +25,7 @@
     "check:architecture": "node scripts/check-architecture.mjs",
     "backend:env": "node --conditions=react-server scripts/check-backend-env.mjs",
     "jobs:worker": "node --experimental-transform-types --conditions=react-server scripts/research-worker.mjs",
+    "jobs:conversation": "node --experimental-transform-types --conditions=react-server scripts/conversation-worker.mjs",
     "backend:check": "node scripts/check-runtime.mjs && pnpm check:architecture && pnpm backend:env && pnpm typecheck && pnpm test"
   },
   "dependencies": {

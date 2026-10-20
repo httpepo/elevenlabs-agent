@@ -4,6 +4,7 @@ import type { QualificationRepository } from "../../../qualification/ports/quali
 import type { ResearchRepository } from "../../../research/ports/research-repository.ts";
 import type { MeetingAttemptRepository } from "../../../scheduling/ports/meeting-attempt-repository.ts";
 import type { AttendanceOverviewItem, AttendanceStageStatus } from "../audit-dto.ts";
+import type { ConversationProcessingRepository } from "../../../conversation/ports/conversation-processing-repository.ts";
 
 export class ListAttendanceOverviewUseCase {
   constructor(
@@ -12,6 +13,7 @@ export class ListAttendanceOverviewUseCase {
     private readonly conversations: ConversationRepository,
     private readonly qualifications: QualificationRepository,
     private readonly meetings: MeetingAttemptRepository,
+    private readonly processingJobs: ConversationProcessingRepository,
   ) {}
 
   async execute(): Promise<AttendanceOverviewItem[]> {
@@ -24,6 +26,7 @@ export class ListAttendanceOverviewUseCase {
         this.meetings.listByLead(lead.id, lead.executionId),
       ]);
       const latestMeeting = meetings.at(-1);
+      const processing = session ? await this.processingJobs.get(session.id) : null;
       return {
         leadId: lead.id,
         executionId: lead.executionId,
@@ -42,7 +45,7 @@ export class ListAttendanceOverviewUseCase {
         stages: {
           research: researchStatus(run?.status ?? lead.research.status),
           conversation: conversationStatus(session?.status ?? lead.conversation.status),
-          spiced: qualification ? "completed" : session?.status === "finalizing" ? "in_progress" : session?.status === "failed" ? "failed" : "pending",
+          spiced: qualification?.voiceSessionId === session?.id && qualification ? "completed" : processing?.status === "failed" ? "failed" : processing ? "in_progress" : session?.status === "finalizing" ? "in_progress" : "pending",
           meeting: meetingStatus(latestMeeting?.status),
         },
       } satisfies AttendanceOverviewItem;

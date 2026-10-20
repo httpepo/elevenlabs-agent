@@ -36,6 +36,11 @@ export type LeadAuditView = Readonly<{
     sessionId: string | null;
     status: "not_started" | "ready" | "connecting" | "active" | "finalizing" | "completed" | "abandoned" | "failed";
     processing: boolean;
+    processingDelayed: boolean;
+    processingStatus: "queued" | "running" | "completed" | "failed" | null;
+    processingMessage: string | null;
+    processingError: string | null;
+    failureReason: string | null;
     durationMs: number | null;
     terminationReason: "completed" | "abandoned" | "failed" | null;
     transcript: TranscriptSegment[];

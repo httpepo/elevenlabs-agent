@@ -3,8 +3,10 @@ import { deploymentAccess } from "@/infrastructure/bootstrap";
 import { readLeadSessionCredential } from "@/infrastructure/bootstrap";
 import { VoiceAuthorizationError } from "@/modules/conversation/application/prepare-voice-session";
 import { type VoiceBrowserEvent } from "@/modules/conversation/application/process-voice-session-event";
+import { after } from "next/server";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const browserEvents = new Set<VoiceBrowserEvent>(["connecting", "connected", "finalizing", "abandoned", "failed", "disconnected"]);
 
@@ -28,6 +30,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       reason: payload.reason,
       credential: readLeadSessionCredential(request),
     });
+    if (["finalizing", "failed", "abandoned"].includes(session.status)) {
+      after(() => conversationRuntime.recoverConversation(session.id));
+    }
     return Response.json({ voiceSessionId: session.id, status: session.status });
   } catch (error) {
     if (error instanceof VoiceAuthorizationError) return Response.json({ error: error.message, code: error.kind }, { status: error.status });

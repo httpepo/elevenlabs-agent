@@ -2,6 +2,7 @@ import type { ConversationRepository } from "../ports/conversation-repository.ts
 import type { LeadRepository } from "../../leads/ports/lead-repository.ts";
 import type { LeadSessionCredentialVerifier } from "../ports/lead-session-credential-verifier.ts";
 import { VoiceAuthorizationError } from "./prepare-voice-session.ts";
+import type { ScheduleConversationProcessingUseCase } from "./schedule-conversation-processing.ts";
 
 export type VoiceBrowserEvent = "connecting" | "connected" | "finalizing" | "abandoned" | "failed" | "disconnected";
 
@@ -10,6 +11,7 @@ export class ProcessVoiceSessionEventUseCase {
     private readonly leads: LeadRepository,
     private readonly conversations: ConversationRepository,
     private readonly credentials: LeadSessionCredentialVerifier,
+    private readonly schedule: ScheduleConversationProcessingUseCase,
   ) {}
 
   async execute(input: { leadId: string; sessionId: string; credential: string | null; event: VoiceBrowserEvent; reason?: string }) {
@@ -31,15 +33,19 @@ export class ProcessVoiceSessionEventUseCase {
         reason: "Conexão WebRTC iniciou antes da confirmação do evento connecting.",
       });
     }
-    return this.conversations.transitionSession({
+    const session = await this.conversations.transitionSession({
       sessionId: current.id,
       status: nextStatus,
       reason: input.reason ?? `Evento do navegador: ${input.event}.`,
     });
+    await this.schedule.execute(session.id);
+    return session;
   }
 }
 
 function mapEvent(event: VoiceBrowserEvent, current: string): "connecting" | "active" | "finalizing" | "abandoned" | "failed" | null {
+  if (["completed", "failed", "abandoned"].includes(current)) return null;
+  if (current === "finalizing" && ["connecting", "connected"].includes(event)) return null;
   if (event === "connecting") return "connecting";
   if (event === "connected") return "active";
   if (event === "finalizing") return "finalizing";

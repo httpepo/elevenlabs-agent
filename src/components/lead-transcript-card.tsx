@@ -12,7 +12,8 @@ export function LeadTranscriptCard({ conversation }: { conversation: LeadAuditVi
         </div>
       </CardHeader>
       <CardContent className="grid gap-6 p-0">
-        {conversation.processing ? <div role="status" className="rounded-lg border border-primary/40 bg-primary/10 p-4 text-sm text-foreground"><span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-primary" aria-hidden="true" />Processando conversa...</div> : null}
+        {conversation.processingMessage ? <div role={conversation.processingDelayed || conversation.processingStatus === "failed" ? "alert" : "status"} className="rounded-lg border bg-background p-4 text-sm text-foreground">{conversation.processingMessage}{conversation.processingError ? <p className="mb-0 text-muted-foreground">{conversation.processingError}</p> : null}</div> : null}
+        {conversation.failureReason ? <p role="alert" className="notice m-0">{conversation.failureReason}</p> : null}
         <section aria-labelledby="conversation-summary-title" className="rounded-lg border bg-background p-5">
           <h3 id="conversation-summary-title" className="mt-0">Resumo executivo</h3>
           <p className="mb-0 whitespace-pre-wrap text-sm text-muted-foreground">{conversation.summary ?? "O resumo pós-chamada ainda não está disponível."}</p>

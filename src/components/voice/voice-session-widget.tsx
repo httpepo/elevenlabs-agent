@@ -30,6 +30,7 @@ function VoiceSessionContent({ leadId, visitorName, autoStart }: { leadId: strin
   const [prepared, setPrepared] = useState<PreparedVoiceSession | null>(null);
   const [conversationLines, setConversationLines] = useState<ConversationLine[]>([]);
   const [streamingAgentText, setStreamingAgentText] = useState("");
+  const [endingDelayed, setEndingDelayed] = useState(false);
   const stateRef = useRef<VoiceWidgetState>(state);
   const sessionIdRef = useRef<string | null>(null);
   const endingRef = useRef(false);
@@ -128,13 +129,19 @@ function VoiceSessionContent({ leadId, visitorName, autoStart }: { leadId: strin
       try {
         const response = await fetch(`/api/leads/${leadId}/voice/status`, { cache: "no-store", credentials: "same-origin" });
         if (!response.ok) return;
-        const payload = await response.json() as { status?: string };
+        const payload = await response.json() as { status?: string; processingStatus?: string; processingDelayed?: boolean };
+        setEndingDelayed(Boolean(payload.processingDelayed));
+        if (payload.processingStatus === "completed") setState("completed");
+        if (payload.processingStatus === "failed") {
+          setError({ kind: "network", message: "A conversa foi encerrada. Não conseguimos concluir seu atendimento agora; nosso time poderá verificar o registro." });
+          setState("failed");
+        }
         if (payload.status === "completed") setState("completed");
-        if (payload.status === "failed") {
+        if (payload.status === "failed" && payload.processingStatus !== "completed") {
           setError({ kind: "network", message: "Não foi possível confirmar o encerramento da conversa. Tente novamente." });
           setState("failed");
         }
-        if (payload.status === "abandoned") setState("abandoned");
+        if (payload.status === "abandoned" && payload.processingStatus !== "completed") setState("abandoned");
       } catch { /* A próxima consulta tenta novamente. */ }
     }, 1_500);
     return () => window.clearInterval(timer);
@@ -205,7 +212,7 @@ function VoiceSessionContent({ leadId, visitorName, autoStart }: { leadId: strin
   const orbState = isSpeaking ? "is-speaking" : isListening ? "is-listening" : state === "connecting" || state === "preparing" ? "is-connecting" : "";
   const showStartButton = canStart && (!autoStart || state === "abandoned");
 
-  if (state === "ending") return <ConversationEndingState />;
+  if (state === "ending") return <ConversationEndingState delayed={endingDelayed} />;
   if (state === "completed") return <ConversationCompletedState />;
 
   return (
@@ -253,7 +260,7 @@ function VoiceSessionContent({ leadId, visitorName, autoStart }: { leadId: strin
   );
 }
 
-function ConversationEndingState() {
+function ConversationEndingState({ delayed }: { delayed: boolean }) {
   return (
     <Card className="voice-session-card record-card">
       <div className="preparation-status voice-closing-status is-preparing" role="status" aria-live="polite">
@@ -261,7 +268,7 @@ function ConversationEndingState() {
           <span className="preparation-spinner" />
         </div>
         <div className="preparation-status-copy">
-          <p>Aguarde enquanto encerramos a conversa</p>
+          <p>{delayed ? "Seu atendimento está levando mais tempo que o esperado. Estamos finalizando seu registro." : "Aguarde enquanto encerramos a conversa"}</p>
         </div>
       </div>
     </Card>
