@@ -8,6 +8,10 @@
       "maxDuration": 120,
       "experimentalTriggers": [{ "type": "queue/v2beta", "topic": "atlas-research" }]
     },
+    "src/app/api/queues/conversation/route.ts": {
+      "maxDuration": 120,
+      "experimentalTriggers": [{ "type": "queue/v2beta", "topic": "atlas-conversation-processing" }]
+    },
     "src/app/api/webhooks/elevenlabs/route.ts": { "maxDuration": 60 }
   }
 }
