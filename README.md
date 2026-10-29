@@ -115,7 +115,9 @@ pnpm db:migrate -- --apply --expect-endpoint SEU_ENDPOINT
 
 Configuração esperada na ElevenLabs:
 
-- Persona `Anderson` (Atlas) e idioma `pt-br`.
+- Persona `Anderson` (Atlas) e idioma `pt-br`, com saudação inicial, prompt base
+  e descrições de ferramentas sincronizados automaticamente na ElevenLabs pelo
+  backend antes de emitir o token WebRTC (ou manualmente via `pnpm voice:sync`).
 - Variável dinâmica `{{spiced_prompt}}` com fatos verificados, lacunas e mapa
   estruturado de objeções.
 - `initial_wait_time=2`, turno `patient`, `speculative_turn=false` e

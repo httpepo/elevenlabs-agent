@@ -1,6 +1,7 @@
 import "server-only";
 import { getServerEnvironment } from "../../config/env.ts";
 import { VoiceProviderError, type VoiceProvider } from "../../../modules/conversation/ports/voice-provider.ts";
+import { ensureElevenLabsAgentPersona } from "./elevenlabs-agent-persona-sync.ts";
 
 const TOKEN_ENDPOINT = "https://api.elevenlabs.io/v1/convai/conversation/token";
 const REQUEST_TIMEOUT_MS = 8_000;
@@ -11,6 +12,10 @@ export class ElevenLabsVoiceProvider implements VoiceProvider {
     if (!environment.ELEVENLABS_API_KEY || !environment.ELEVENLABS_AGENT_ID) {
       throw new VoiceProviderError("A integração de voz não está configurada no servidor.", "configuration");
     }
+    await ensureElevenLabsAgentPersona({
+      apiKey: environment.ELEVENLABS_API_KEY,
+      agentId: environment.ELEVENLABS_AGENT_ID,
+    });
     const url = new URL(TOKEN_ENDPOINT);
     url.searchParams.set("agent_id", environment.ELEVENLABS_AGENT_ID);
     url.searchParams.set("participant_name", input.participantName.slice(0, 120));

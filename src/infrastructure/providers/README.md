@@ -5,7 +5,7 @@ ficam nesta pasta, agrupadas por provedor:
 
 - `research/`: busca Tavily e síntese de briefing Gemini.
 - `qualification/`: extração estruturada SPICED com Gemini.
-- `elevenlabs/`: sessão WebRTC, resultados pós-chamada e verificação de eventos.
+- `elevenlabs/`: sincronização da persona `Anderson - Atlas`, sessão WebRTC, resultados pós-chamada e verificação de eventos.
 - `calendar/`: tradução do contrato HTTP da agenda comercial.
 
 `calendar/http-calendar-provider.ts` implementa o cliente HTTP da agenda com

@@ -33,9 +33,10 @@ export function compileVoiceContext(input: {
   const normalizedComplexity = complexity || "não confirmado publicamente";
   const gaps = input.briefing.gaps.map((gap) => gap.prompt.trim()).filter(Boolean);
   const verifiedContext = input.briefing.facts.map((fact) => formatFact(fact));
+  const visitorFirstName = firstName(input.lead.fullName);
   const openingInstruction = sector
-    ? `Cumprimente ${firstName(input.lead.fullName)}, identifique-se como Anderson, da Atlas, reconheça o setor confirmado (${sector}) e pergunte o que motivou o interesse agora.`
-    : `Cumprimente ${firstName(input.lead.fullName)}, identifique-se como Anderson, da Atlas, agradeça o interesse na plataforma financeira e peça o contexto atual da empresa.`;
+    ? `Na continuidade após a saudação inicial para ${visitorFirstName}, reconheça com naturalidade o setor confirmado (${sector}) da ${input.lead.company} sem repetir sua apresentação como Anderson, da Atlas.`
+    : `Na continuidade após a saudação inicial para ${visitorFirstName}, acolha o contexto inicial trazido sobre a ${input.lead.company} sem repetir sua apresentação como Anderson, da Atlas.`;
   const spicedPrompt = buildVoiceQualificationPrompt({
     visitorName: input.lead.fullName,
     companyName: input.lead.company,
@@ -45,7 +46,7 @@ export function compileVoiceContext(input: {
 
   return {
     lead_id: input.leadId,
-    visitor_name: firstName(input.lead.fullName),
+    visitor_name: visitorFirstName,
     company_name: input.lead.company,
     company_website: input.lead.website || "não informado",
     company_sector: normalizedSector,
